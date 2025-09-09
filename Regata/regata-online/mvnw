@@ -1,0 +1,20 @@
+#!/bin/sh
+# Maven Wrapper startup script for POSIX systems
+set -e
+DIR="$(cd "$(dirname "$0")" && pwd)"
+WRAPPER_JAR="$DIR/.mvn/wrapper/maven-wrapper.jar"
+WRAPPER_LAUNCHER=org.apache.maven.wrapper.MavenWrapperMain
+DOWNLOAD_URL="https://repo.maven.apache.org/maven2/org/apache/maven/wrapper/maven-wrapper/3.3.2/maven-wrapper-3.3.2.jar"
+
+if [ ! -f "$WRAPPER_JAR" ]; then
+  echo "Downloading Maven Wrapper jar..."
+  mkdir -p "$(dirname "$WRAPPER_JAR")"
+  curl -fsSL "$DOWNLOAD_URL" -o "$WRAPPER_JAR" || wget -qO "$WRAPPER_JAR" "$DOWNLOAD_URL"
+fi
+
+JAVA_EXE="java"
+if [ -n "$JAVA_HOME" ]; then
+  JAVA_EXE="$JAVA_HOME/bin/java"
+fi
+
+exec "$JAVA_EXE" -classpath "$WRAPPER_JAR" $WRAPPER_LAUNCHER "$@"

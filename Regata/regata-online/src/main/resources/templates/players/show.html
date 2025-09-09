@@ -1,0 +1,16 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout :: layout(~{::section})}">
+<body>
+<section>
+    <h2 th:text="'Jugador: ' + ${player.displayName}"></h2>
+    <p><strong>ID:</strong> <span th:text="${player.id}"></span></p>
+    <p><strong>Usuario:</strong> <span th:text="${player.username}"></span></p>
+    <p><strong>Nombre:</strong> <span th:text="${player.displayName}"></span></p>
+    
+    <div class="actions">
+        <a th:href="@{|/players/${player.id}/edit|}" class="btn">Editar</a>
+        <a th:href="@{/players}" class="btn">Volver a la lista</a>
+    </div>
+</section>
+</body>
+</html>
