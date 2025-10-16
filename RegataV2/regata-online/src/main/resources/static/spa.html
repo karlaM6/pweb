@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Regata Online - SPA</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            color: #2563eb;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        nav {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        nav button {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: transform 0.2s;
+        }
+
+        nav button:hover {
+            transform: translateY(-2px);
+        }
+
+        nav button.active {
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+        }
+
+        #app {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            min-height: 500px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #6b7280;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        th {
+            background: #f3f4f6;
+            font-weight: 600;
+            color: #374151;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: #3b82f6;
+            color: white;
+        }
+
+        .btn-danger {
+            background: #ef4444;
+            color: white;
+        }
+
+        .btn:hover {
+            opacity: 0.9;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #374151;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        .game-board {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+
+        #raceGrid {
+            display: grid;
+            gap: 2px;
+            background: #0ea5e9;
+            padding: 10px;
+            border-radius: 12px;
+        }
+
+        .controls {
+            display: flex;
+            gap: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>⛵ Regata Online - Single Page Application</h1>
+            <nav>
+                <button onclick="navigate('players')" data-page="players">👥 Jugadores</button>
+                <button onclick="navigate('boats')" data-page="boats">🚢 Barcos</button>
+                <button onclick="navigate('models')" data-page="models">📋 Modelos</button>
+                <button onclick="navigate('maps')" data-page="maps">🗺️ Mapas</button>
+                <button onclick="navigate('game')" data-page="game">🎮 Jugar</button>
+            </nav>
+        </header>
+
+        <div id="app">
+            <div class="loading">Cargando...</div>
+        </div>
+    </div>
+
+    <script src="/spa/api.js"></script>
+    <script src="/spa/auth.js"></script>
+    <script src="/spa/router.js"></script>
+    <script src="/spa/components.js"></script>
+    <script src="/spa/game.js"></script>
+</body>
+</html>

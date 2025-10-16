@@ -1,0 +1,19 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout :: layout(~{::section})}">
+<body>
+<section>
+    <h2 th:text="'Mapa: ' + ${gameMap.name}"></h2>
+    <p><strong>ID:</strong> <span th:text="${gameMap.id}"></span></p>
+    <p><strong>Nombre:</strong> <span th:text="${gameMap.name}"></span></p>
+    <p><strong>Dimensiones:</strong> <span th:text="${gameMap.width + 'x' + gameMap.height}"></span></p>
+    
+    <h3>Grid del Mapa:</h3>
+    <pre th:text="${gameMap.grid}" style="font-family: monospace; background: #f5f5f5; padding: 10px; border: 1px solid #ddd;"></pre>
+    
+    <div class="actions">
+        <a th:href="@{|/maps/${gameMap.id}/edit|}" class="btn">Editar</a>
+        <a th:href="@{/maps}" class="btn">Volver a la lista</a>
+    </div>
+</section>
+</body>
+</html>

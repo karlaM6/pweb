@@ -1,0 +1,18 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout :: layout(~{::section})}">
+<body>
+<section>
+    <h2>Barco</h2>
+    <p><strong>ID:</strong> <span th:text="${boat.id}"></span></p>
+    <p><strong>Modelo:</strong> <span th:text="${boat.model.name}"></span></p>
+    <p><strong>Dueño:</strong> <span th:text="${boat.owner.username}"></span></p>
+    <p><strong>Velocidad:</strong> v=(<span th:text="${boat.vx}"></span>, <span th:text="${boat.vy}"></span>)</p>
+    <p><strong>Posición:</strong> p=(<span th:text="${boat.x}"></span>, <span th:text="${boat.y}"></span>)</p>
+    
+    <div class="actions">
+        <a th:href="@{|/boats/${boat.id}/edit|}" class="btn">Editar</a>
+        <a th:href="@{/boats}" class="btn">Volver a la lista</a>
+    </div>
+</section>
+</body>
+</html>
