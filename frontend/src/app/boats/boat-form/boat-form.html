@@ -1,0 +1,14 @@
+<h2>Registrar Barco</h2>
+
+<form (ngSubmit)="guardar()">
+  <label>Nombre:</label>
+  <input [(ngModel)]="boat.nombre" name="nombre" required />
+
+  <label>Color:</label>
+  <input [(ngModel)]="boat.color" name="color" required />
+
+  <label>Resistencia:</label>
+  <input type="number" [(ngModel)]="boat.resistencia" name="resistencia" required />
+
+  <button type="submit">Guardar</button>
+</form>

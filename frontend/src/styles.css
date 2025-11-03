@@ -1,0 +1,16 @@
+nav {
+  background-color: #004466;
+  color: white;
+  padding: 10px;
+}
+
+a {
+  color: white;
+  margin-right: 10px;
+  text-decoration: none;
+}
+
+table {
+  border-collapse: collapse;
+  width: 100%;
+}
