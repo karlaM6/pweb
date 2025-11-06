@@ -1,1 +1,0 @@
-# Regata-online-testing
