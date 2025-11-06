@@ -1,50 +1,35 @@
 import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { BoatService } from '../../services/boat';
+import { CommonModule } from '@angular/common'; 
 
 @Component({
   selector: 'app-boat-list',
-  standalone: true,
-  imports: [CommonModule],
+  standalone: true, 
+  imports: [CommonModule], 
   templateUrl: './boat-list.html',
   styleUrls: ['./boat-list.css']
 })
-export class BoatListComponent implements OnInit {
+export class BoatList implements OnInit {
+
   boats: any[] = [];
-  cargando: boolean = false; // 👈 Agrega esta propiedad
+  cargando = true;
 
   constructor(private boatService: BoatService) {}
 
   ngOnInit(): void {
-    this.cargarBoats();
+    this.cargarBarcos();
   }
 
-  cargarBoats(): void {
-    this.cargando = true; // 👈 Activa el indicador
-    this.boatService.listar().subscribe({
-      next: (data) => {
-        this.boats = data;
-        this.cargando = false; // 👈 Desactiva cuando termina
-      },
-      error: (error) => {
-        console.error('Error al cargar barcos:', error);
-        this.cargando = false; // 👈 Desactiva también en caso de error
-      }
+  cargarBarcos(): void {
+    this.boatService.listar().subscribe(data => {
+      this.boats = data;
+      this.cargando = false;
     });
   }
 
   eliminar(id: number): void {
-    if (confirm('¿Estás seguro de eliminar este barco?')) {
-      this.boatService.eliminar(id).subscribe({
-        next: () => {
-          alert('Barco eliminado correctamente');
-          this.cargarBoats();
-        },
-        error: (error) => {
-          console.error('Error al eliminar barco:', error);
-          alert('Error al eliminar el barco');
-        }
-      });
+    if (confirm('¿Seguro que deseas eliminar este barco?')) {
+      this.boatService.eliminar(id).subscribe(() => this.cargarBarcos());
     }
   }
 }

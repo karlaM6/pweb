@@ -5,7 +5,21 @@
   "projects": {
     "frontend": {
       "projectType": "application",
-      "schematics": {},
+      "schematics": {
+  "@schematics/angular:component": {
+    "type": "component",
+    "nameSeparator": ".",
+    "typeSuffix": "component"
+  },
+  "@schematics/angular:directive": { "type": "directive" },
+  "@schematics/angular:service": { "type": "service" },
+  "@schematics/angular:guard": { "typeSeparator": "." },
+  "@schematics/angular:interceptor": { "typeSeparator": "." },
+  "@schematics/angular:module": { "typeSeparator": "." },
+  "@schematics/angular:pipe": { "typeSeparator": "." },
+  "@schematics/angular:resolver": { "typeSeparator": "." }
+},
+
       "root": "",
       "sourceRoot": "src",
       "prefix": "app",
@@ -90,6 +104,6 @@
     }
   },
   "cli": {
-    "analytics": false
+    "analytics": "802f7b39-756f-4287-8231-1916e436dea1"
   }
 }

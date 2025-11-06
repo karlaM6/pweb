@@ -1,16 +1,17 @@
-nav {
+/* You can add global styles to this file, and also import other style files */
+body {
+  font-family: Arial, sans-serif;
+  margin: 20px;
+}
+
+button {
+  background-color: #006699;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  cursor: pointer;
+}
+
+button:hover {
   background-color: #004466;
-  color: white;
-  padding: 10px;
-}
-
-a {
-  color: white;
-  margin-right: 10px;
-  text-decoration: none;
-}
-
-table {
-  border-collapse: collapse;
-  width: 100%;
 }

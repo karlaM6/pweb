@@ -1,1 +1,14 @@
-<p>model-form works!</p>
+<h2>Registrar Modelo</h2>
+
+<form (ngSubmit)="guardar()" #modelForm="ngForm">
+  <label>Nombre:</label>
+  <input [(ngModel)]="model.nombre_modelo" name="nombre_modelo" required />
+
+  <label>Color:</label>
+  <input [(ngModel)]="model.color" name="color" required />
+
+  <label>Resistencia:</label>
+  <input type="number" [(ngModel)]="model.resistencia" name="resistencia" required />
+
+  <button type="submit" [disabled]="modelForm.invalid">Guardar</button>
+</form>

@@ -6,7 +6,7 @@ import { Observable } from 'rxjs';
   providedIn: 'root'
 })
 export class BoatService {
-  private apiUrl = 'http://localhost:8080/api/boats';
+private apiUrl = 'http://localhost:5000/api/boats';
 
   constructor(private http: HttpClient) {}
 
@@ -20,13 +20,5 @@ export class BoatService {
 
   eliminar(id: number): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/${id}`);
-  }
-
-  obtener(id: number): Observable<any> {
-    return this.http.get<any>(`${this.apiUrl}/${id}`);
-  }
-
-  actualizar(id: number, boat: any): Observable<any> {
-    return this.http.put<any>(`${this.apiUrl}/${id}`, boat);
   }
 }

@@ -1,1 +1,19 @@
-<p>model-list works!</p>
+<h2>Lista de Modelos</h2>
+<div *ngIf="cargando">Cargando modelos...</div>
+
+<table *ngIf="!cargando" border="1" cellpadding="5">
+  <tr>
+    <th>ID</th>
+    <th>Nombre</th>
+    <th>Color</th>
+    <th>Resistencia</th>
+    <th>Acciones</th>
+  </tr>
+  <tr *ngFor="let m of models">
+    <td>{{ m.id }}</td>
+    <td>{{ m.nombre_modelo }}</td>
+    <td>{{ m.color }}</td>
+    <td>{{ m.resistencia }}</td>
+    <td><button (click)="eliminar(m.id)">Eliminar</button></td>
+  </tr>
+</table>
