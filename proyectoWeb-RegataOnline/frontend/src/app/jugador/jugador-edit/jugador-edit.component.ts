@@ -21,7 +21,10 @@ export class JugadorEditComponent {
   ngOnInit(): void {
     this.route.params.pipe(
       switchMap(params => this.jugadorService.findById(+params['id']))
-    ).subscribe(resp => this.jugador.set(resp));
+    ).subscribe({
+      next: resp => this.jugador.set(resp),
+      error: err => console.error('Error cargando jugador', err)
+    });
   }
 
   guardar() {

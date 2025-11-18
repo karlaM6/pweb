@@ -18,25 +18,37 @@ import { PartidaMenuComponent } from './partida/partida-menu/partida-menu.compon
 import { PartidaCrearComponent } from './partida/partida-crear/partida-crear.component';
 import { PartidaJuegoComponent } from './partida/partida-juego/partida-juego.component';
 import { HomeComponent } from './home/home.component';
+import { LoginComponent } from './security/login/login.component';
+import { authGuard } from './guards/auth.guard';
 
 export const routes: Routes = [
     { path: '', component: HomeComponent },
-    { path: 'barco/list', component: BarcoListaComponent },
-    { path: 'barco/create', component: BarcoCreateComponent },
-    { path: 'barco/view/:id', component: BarcoViewComponent },
-    { path: 'barco/edit/:id', component: BarcoEditComponent },
-    { path: 'jugador/list', component: JugadorListaComponent },
-    { path: 'jugador/create', component: JugadorCreateComponent },
-    { path: 'jugador/view/:id', component: JugadorViewComponent },
-    { path: 'jugador/edit/:id', component: JugadorEditComponent },
-    { path: 'modelo/list', component: ModeloListaComponent },
-    { path: 'modelo/create', component: ModeloCreateComponent },
-    { path: 'modelo/view/:id', component: ModeloViewComponent },
-    { path: 'modelo/edit/:id', component: ModeloEditComponent },
-    { path: 'mapa/list', component: MapaListaComponent },
-    { path: 'mapa/create', component: MapaCreateComponent },
-    { path: 'mapa/view/:id', component: MapaViewComponent },
-    { path: 'partida/menu', component: PartidaMenuComponent },
-    { path: 'partida/crear', component: PartidaCrearComponent },
-    { path: 'partida/juego/:id', component: PartidaJuegoComponent }
+    { path: 'login', component: LoginComponent },
+    // Barcos: list/view require authentication, create/edit require ADMIN role
+    { path: 'barco/list', component: BarcoListaComponent, canActivate: [authGuard] },
+    { path: 'barco/create', component: BarcoCreateComponent, canActivate: [authGuard], data: { roles: ['ADMIN'] } },
+    { path: 'barco/view/:id', component: BarcoViewComponent, canActivate: [authGuard] },
+    { path: 'barco/edit/:id', component: BarcoEditComponent, canActivate: [authGuard], data: { roles: ['ADMIN'] } },
+
+    // Jugadores
+    { path: 'jugador/list', component: JugadorListaComponent, canActivate: [authGuard] },
+    { path: 'jugador/create', component: JugadorCreateComponent, canActivate: [authGuard], data: { roles: ['ADMIN'] } },
+    { path: 'jugador/view/:id', component: JugadorViewComponent, canActivate: [authGuard] },
+    { path: 'jugador/edit/:id', component: JugadorEditComponent, canActivate: [authGuard], data: { roles: ['ADMIN'] } },
+
+    // Modelos
+    { path: 'modelo/list', component: ModeloListaComponent, canActivate: [authGuard] },
+    { path: 'modelo/create', component: ModeloCreateComponent, canActivate: [authGuard], data: { roles: ['ADMIN'] } },
+    { path: 'modelo/view/:id', component: ModeloViewComponent, canActivate: [authGuard] },
+    { path: 'modelo/edit/:id', component: ModeloEditComponent, canActivate: [authGuard], data: { roles: ['ADMIN'] } },
+
+    // Mapas
+    { path: 'mapa/list', component: MapaListaComponent, canActivate: [authGuard] },
+    { path: 'mapa/create', component: MapaCreateComponent, canActivate: [authGuard], data: { roles: ['ADMIN'] } },
+    { path: 'mapa/view/:id', component: MapaViewComponent, canActivate: [authGuard] },
+
+    // Partidas: require authentication for menu/crear/juego
+    { path: 'partida/menu', component: PartidaMenuComponent, canActivate: [authGuard] },
+    { path: 'partida/crear', component: PartidaCrearComponent, canActivate: [authGuard] },
+    { path: 'partida/juego/:id', component: PartidaJuegoComponent, canActivate: [authGuard] }
 ];

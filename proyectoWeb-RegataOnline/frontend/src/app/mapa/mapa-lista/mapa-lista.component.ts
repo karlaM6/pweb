@@ -2,6 +2,7 @@ import { Component, inject, signal, OnInit } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { MapaService, Mapa } from '../../shared/mapa.service';
+import { AuthService } from '../../shared/auth.service';
 
 @Component({
   selector: 'app-mapa-lista',
@@ -12,6 +13,7 @@ import { MapaService, Mapa } from '../../shared/mapa.service';
 export class MapaListaComponent implements OnInit {
   mapaService = inject(MapaService);
   router = inject(Router);
+  auth = inject(AuthService);
 
   mapas = signal<Mapa[]>([]);
   cargando = signal(true);

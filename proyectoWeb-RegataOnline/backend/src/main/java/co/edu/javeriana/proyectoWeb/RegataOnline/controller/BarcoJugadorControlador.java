@@ -17,6 +17,8 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.security.access.annotation.Secured;
+import co.edu.javeriana.proyectoWeb.RegataOnline.model.Role;
 
 @RestController
 @RequestMapping("/jugador/barcos")
@@ -25,6 +27,7 @@ public class BarcoJugadorControlador {
     @Autowired
     private BarcoServicio barcoServicio;
 
+    @Secured({ Role.Code.USER, Role.Code.ADMIN })
     @GetMapping("/{jugadorId}")
     @Operation(summary = "Obtener barcos de un jugador", description = "Devuelve los barcos asociados a un jugador específico")
     @ApiResponse(responseCode = "200", description = "Barcos del jugador obtenidos exitosamente")
@@ -34,6 +37,7 @@ public class BarcoJugadorControlador {
         return barcoServicio.getBarcoJugador(jugadorId);
     }
 
+    @Secured({ Role.Code.ADMIN })
     @PostMapping("/save")
     @Operation(summary = "Actualizar barcos de un jugador", description = "Actualiza la relación de barcos para un jugador")
     @ApiResponse(responseCode = "200", description = "Barcos del jugador actualizados exitosamente")

@@ -1,7 +1,7 @@
 <div class="container">
-  <div class="header">
+    <div class="header">
     <h1>Mapas de Regatas</h1>
-    <button (click)="crearNuevoMapa()" class="btn btn-primary">
+    <button *ngIf="auth.isAdmin()" (click)="crearNuevoMapa()" class="btn btn-primary">
       + Crear Nuevo Mapa
     </button>
   </div>
@@ -11,10 +11,10 @@
       <p>Cargando mapas...</p>
     </div>
   } @else if (mapas().length === 0) {
-    <div class="empty-state">
+      <div class="empty-state">
       <h2>No hay mapas creados</h2>
       <p>Crea tu primer mapa para comenzar</p>
-      <button (click)="crearNuevoMapa()" class="btn btn-primary">
+      <button *ngIf="auth.isAdmin()" (click)="crearNuevoMapa()" class="btn btn-primary">
         Crear Mapa
       </button>
     </div>
@@ -46,7 +46,7 @@
           </div>
 
           <div class="mapa-actions">
-            <button 
+            <button *ngIf="auth.isAdmin()"
               class="btn btn-danger btn-sm"
               (click)="eliminarMapa(mapa.id, $event)">
               Eliminar

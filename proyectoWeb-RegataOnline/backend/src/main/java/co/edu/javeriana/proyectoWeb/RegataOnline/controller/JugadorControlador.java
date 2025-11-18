@@ -20,6 +20,8 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.security.access.annotation.Secured;
+import co.edu.javeriana.proyectoWeb.RegataOnline.model.Role;
 
 
 @RestController
@@ -32,6 +34,7 @@ public class JugadorControlador {
     @GetMapping("/list")
     @Operation(summary = "Listar todos los jugadores", description = "Obtiene una lista de todos los jugadores")
     @ApiResponse(responseCode = "200", description = "Lista de jugadores obtenida exitosamente")
+    @Secured({ Role.Code.USER, Role.Code.ADMIN })
     public List<JugadorDTO> listarJugadores() {
         return jugadorServicio.listarJugadores();
     }
@@ -48,6 +51,7 @@ public class JugadorControlador {
         return jugadorServicio.buscarJugador(id);
     }
 
+    @Secured({ Role.Code.ADMIN })
     @PostMapping
     @Operation(summary = "Crear un nuevo jugador", description = "Registra un nuevo jugador en el sistema")
     @ApiResponse(responseCode = "200", description = "Jugador creado exitosamente")
@@ -57,6 +61,7 @@ public class JugadorControlador {
         jugadorServicio.guardarJugador(jugadorDTO);
     }
 
+    @Secured({ Role.Code.ADMIN })
     @PutMapping
     @Operation(summary = "Actualizar un jugador existente", description = "Actualiza la información de un jugador existente")
     @ApiResponse(responseCode = "200", description = "Jugador actualizado exitosamente")
@@ -66,6 +71,7 @@ public class JugadorControlador {
         jugadorServicio.guardarJugador(jugadorDTO);
     }
 
+    @Secured({ Role.Code.ADMIN })
     @DeleteMapping("/{id}")
     @Operation(summary = "Eliminar un jugador", description = "Elimina un jugador del sistema")
     @ApiResponse(responseCode = "200", description = "Jugador eliminado exitosamente")

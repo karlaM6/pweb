@@ -43,12 +43,15 @@ export class BarcoEditComponent {
     
     this.route.params.pipe(
       switchMap(params => this.barcoService.findById(+params['id']))
-    ).subscribe(resp => {
-      this.barco.set(resp);
-      // Si el barco tiene una celda asignada, cargar su mapa
-      if (resp.celdaId) {
-        this.cargarMapaDeCelda(resp.celdaId);
-      }
+    ).subscribe({
+      next: resp => {
+        this.barco.set(resp);
+        // Si el barco tiene una celda asignada, cargar su mapa
+        if (resp.celdaId) {
+          this.cargarMapaDeCelda(resp.celdaId);
+        }
+      },
+      error: err => console.error('Error cargando barco', err)
     });
   }
 

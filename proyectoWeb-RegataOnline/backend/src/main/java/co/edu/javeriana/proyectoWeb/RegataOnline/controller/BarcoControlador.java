@@ -25,6 +25,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
+import co.edu.javeriana.proyectoWeb.RegataOnline.model.Role;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -47,6 +49,7 @@ public class BarcoControlador {
 
     private Logger log = LoggerFactory.getLogger(getClass());
 
+    @Secured({ Role.Code.USER, Role.Code.ADMIN })
     @GetMapping("/list")
     @Operation(summary = "Listar todos los barcos", description = "Obtiene una lista completa de todos los barcos registrados en el sistema")
     @ApiResponse(responseCode = "200", description = "Lista de barcos obtenida exitosamente")
@@ -54,6 +57,7 @@ public class BarcoControlador {
         return barcoServicio.listarBarcos();
     }
 
+    @Secured({ Role.Code.USER, Role.Code.ADMIN })
     @GetMapping("/list/{page}")
     @Operation(summary = "Listar barcos con paginación", description = "Obtiene una lista de barcos paginada (10 por pagina). El número de página debe ser mayor o igual 0.")
      @ApiResponses(value = {
@@ -72,6 +76,7 @@ public class BarcoControlador {
         
     }
 
+    @Secured({ Role.Code.USER, Role.Code.ADMIN })
     @GetMapping("/search")
     @Operation(summary = "Buscar barcos por nombre", description = "Busca barcos que coincidan con el texto proporcionado en el nombre.")
     @ApiResponses(value = {
@@ -93,6 +98,7 @@ public class BarcoControlador {
         }
     }
 
+    @Secured({ Role.Code.USER, Role.Code.ADMIN })
     @GetMapping("{id}")
     @Operation(summary = "Buscar barco por ID", description = "Obtiene los detalles de un barco específico mediante su identificador único")
     @ApiResponses(value = {
@@ -105,6 +111,7 @@ public class BarcoControlador {
         return barcoServicio.buscarBarco(id).orElseThrow();
     }
 
+    @Secured({Role.Code.ADMIN}) 
     @PostMapping
     @Operation(summary = "Crear un nuevo barco", description = "Registra un nuevo barco en el sistema con la información proporcionada")
     @ApiResponses(value = {
@@ -117,6 +124,7 @@ public class BarcoControlador {
         return barcoServicio.crearBarco(barcoDTO);
     }
 
+    @Secured({ Role.Code.ADMIN })
     @PutMapping
     @Operation(summary = "Actualizar un barco existente", description = "Actualiza la información de un barco existente en el sistema")
     @ApiResponses(value = {
@@ -130,6 +138,7 @@ public class BarcoControlador {
         return barcoServicio.actualizarBarco(barcoDTO);
     }
 
+    @Secured({ Role.Code.ADMIN })
     @DeleteMapping("{id}")
     @Operation(summary = "Eliminar un barco", description = "Elimina permanentemente un barco del sistema mediante su identificador único")
     @ApiResponses(value = {

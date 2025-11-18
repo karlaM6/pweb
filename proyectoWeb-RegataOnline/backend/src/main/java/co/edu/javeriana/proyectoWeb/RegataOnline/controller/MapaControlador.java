@@ -1,7 +1,6 @@
 package co.edu.javeriana.proyectoWeb.RegataOnline.controller;
 
 import java.util.List;
-import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,6 +23,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.security.access.annotation.Secured;
 
 @RestController
 @RequestMapping("/mapa")
@@ -35,6 +35,7 @@ public class MapaControlador {
     @Autowired
     private MapaServicio mapaServicio;
 
+    @Secured({ co.edu.javeriana.proyectoWeb.RegataOnline.model.Role.Code.ADMIN })
     @PostMapping("/crear")
     @Operation(summary = "Crear nuevo mapa", description = "Crea un nuevo mapa con las celdas seleccionadas")
     @ApiResponses(value = {
@@ -53,6 +54,13 @@ public class MapaControlador {
             log.error("Error al crear mapa: {}", e.getMessage(), e);
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
+    }
+
+    // Only admins can create or delete maps
+    @Secured({ co.edu.javeriana.proyectoWeb.RegataOnline.model.Role.Code.ADMIN })
+    @PostMapping("/crear-admin")
+    public ResponseEntity<MapaDTO> crearMapaAdmin(@RequestBody CrearMapaRequest request) {
+        return crearMapa(request);
     }
 
     @GetMapping("/list")
@@ -79,6 +87,7 @@ public class MapaControlador {
             .orElse(ResponseEntity.notFound().build());
     }
 
+    @Secured({ co.edu.javeriana.proyectoWeb.RegataOnline.model.Role.Code.ADMIN })
     @DeleteMapping("/{id}")
     @Operation(summary = "Eliminar un mapa", description = "Elimina un mapa del sistema")
     @ApiResponses(value = {
@@ -96,5 +105,12 @@ public class MapaControlador {
             log.error("Error al eliminar mapa {}: {}", id, e.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
+    }
+
+    // Admin-only delete endpoint
+    @Secured({ co.edu.javeriana.proyectoWeb.RegataOnline.model.Role.Code.ADMIN })
+    @DeleteMapping("/admin/{id}")
+    public ResponseEntity<String> borrarMapaAdmin(@PathVariable Long id) {
+        return borrarMapa(id);
     }
 }

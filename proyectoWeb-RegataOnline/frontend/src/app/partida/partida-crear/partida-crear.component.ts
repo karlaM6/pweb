@@ -6,6 +6,7 @@ import { PartidaService, CrearPartidaRequest } from '../../shared/partida.servic
 import { MapaService, Mapa } from '../../shared/mapa.service';
 import { BarcoService } from '../../shared/barco.service';
 import { JugadorService } from '../../shared/jugador.service';
+import { AuthService } from '../../shared/auth.service';
 import { Barco } from '../../model/barco';
 import { Jugador } from '../../model/jugador';
 
@@ -20,6 +21,7 @@ export class PartidaCrearComponent {
   mapaService = inject(MapaService);
   barcoService = inject(BarcoService);
   jugadorService = inject(JugadorService);
+  auth = inject(AuthService);
   router = inject(Router);
   route = inject(ActivatedRoute);
 
@@ -32,17 +34,20 @@ export class PartidaCrearComponent {
   barcoSeleccionado = signal<number | null>(null);
 
   ngOnInit(): void {
-    this.route.queryParams.subscribe(params => {
-      const jugadorId = Number(params['jugadorId']);
-      if (jugadorId) {
-        this.jugadorId.set(jugadorId);
-        this.cargarJugador(jugadorId);
-        this.cargarMapas();
-        this.cargarBarcos(jugadorId);
-      } else {
-        alert('No se especificó un jugador');
-        this.router.navigate(['/partida/menu']);
-      }
+    this.route.queryParams.subscribe({
+      next: params => {
+        const jugadorId = Number(params['jugadorId']);
+        if (jugadorId) {
+          this.jugadorId.set(jugadorId);
+          this.cargarJugador(jugadorId);
+          this.cargarMapas();
+          this.cargarBarcos(jugadorId);
+        } else {
+          alert('No se especificó un jugador');
+          this.router.navigate(['/partida/menu']);
+        }
+      },
+      error: err => console.error('Error leyendo query params', err)
     });
   }
 

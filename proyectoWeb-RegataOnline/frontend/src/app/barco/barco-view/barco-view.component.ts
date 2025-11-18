@@ -22,7 +22,10 @@ export class BarcoViewComponent {
   ngOnInit(): void {
     this.route.params.pipe(
       switchMap(params => this.barcoService.findById(+params['id']))
-    ).subscribe(resp => this.barco.set(resp));
+    ).subscribe({
+      next: resp => this.barco.set(resp),
+      error: err => console.error('Error cargando barco', err)
+    });
   }
 
   volver() {

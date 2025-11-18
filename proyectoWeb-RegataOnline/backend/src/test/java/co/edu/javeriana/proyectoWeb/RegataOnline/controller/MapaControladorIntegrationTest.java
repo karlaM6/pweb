@@ -3,6 +3,16 @@ package co.edu.javeriana.proyectoWeb.RegataOnline.controller;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.RequestEntity;
+import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpStatus;
+import co.edu.javeriana.proyectoWeb.RegataOnline.dto.JwtAuthenticationResponse;
+import co.edu.javeriana.proyectoWeb.RegataOnline.dto.LoginDTO;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import co.edu.javeriana.proyectoWeb.RegataOnline.model.Role;
+import co.edu.javeriana.proyectoWeb.RegataOnline.model.Jugador;
+import co.edu.javeriana.proyectoWeb.RegataOnline.repository.JugadorRepositorio;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
@@ -53,6 +63,12 @@ public class MapaControladorIntegrationTest {
     private PartidaRepositorio partidaRepo;
 
     @Autowired
+    private JugadorRepositorio jugadorRepo;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
+    @Autowired
     private ObjectMapper objectMapper;
 
     private Mapa mapa;
@@ -63,6 +79,22 @@ public class MapaControladorIntegrationTest {
         barcoRepo.deleteAll();
         celdaRepo.deleteAll();
         mapaRepo.deleteAll();
+
+        // create test users
+        jugadorRepo.deleteAll();
+        Jugador admin = new Jugador();
+        admin.setNombre("Admin");
+        admin.setEmail("admin@local");
+        admin.setPassword(passwordEncoder.encode("admin123"));
+        admin.setRole(Role.ADMIN);
+        jugadorRepo.save(admin);
+
+        Jugador user = new Jugador();
+        user.setNombre("User");
+        user.setEmail("user@local");
+        user.setPassword(passwordEncoder.encode("user123"));
+        user.setRole(Role.USER);
+        jugadorRepo.save(user);
 
         mapa = new Mapa(10, 10);
         mapa = mapaRepo.save(mapa);
@@ -76,11 +108,22 @@ public class MapaControladorIntegrationTest {
         celdaRepo.save(celdaMeta);
     }
 
+    private JwtAuthenticationResponse login(String email, String password) {
+    RequestEntity<LoginDTO> request = RequestEntity.post(SERVER_URL + ":" + port + "/auth/login")
+        .body(new LoginDTO(email, password));
+    ResponseEntity<JwtAuthenticationResponse> jwtResponse = restTemplate.exchange(request,
+        JwtAuthenticationResponse.class);
+    JwtAuthenticationResponse body = jwtResponse.getBody();
+    assertNotNull(body);
+    return body;
+    }
+
     @Test
     void testListarMapas_DebeRetornar200() {
-        ResponseEntity<String> response = restTemplate.getForEntity(
-                SERVER_URL + ":" + port + "/mapa/list",
-                String.class);
+    JwtAuthenticationResponse user = login("user@local", "user123");
+    RequestEntity<Void> request = RequestEntity.get(SERVER_URL + ":" + port + "/mapa/list")
+        .header(HttpHeaders.AUTHORIZATION, "Bearer " + user.getToken()).build();
+    ResponseEntity<String> response = restTemplate.exchange(request, String.class);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertNotNull(response.getBody());
@@ -89,9 +132,10 @@ public class MapaControladorIntegrationTest {
 
     @Test
     void testObtenerMapaPorId_DebeRetornar200() throws Exception {
-        ResponseEntity<String> response = restTemplate.getForEntity(
-                SERVER_URL + ":" + port + "/mapa/" + mapa.getId(),
-                String.class);
+    JwtAuthenticationResponse user = login("user@local", "user123");
+    RequestEntity<Void> request = RequestEntity.get(SERVER_URL + ":" + port + "/mapa/" + mapa.getId())
+        .header(HttpHeaders.AUTHORIZATION, "Bearer " + user.getToken()).build();
+    ResponseEntity<String> response = restTemplate.exchange(request, String.class);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertNotNull(response.getBody());
@@ -104,9 +148,10 @@ public class MapaControladorIntegrationTest {
 
     @Test
     void testObtenerMapaPorIdInexistente_DebeRetornar404() {
-        ResponseEntity<?> response = restTemplate.getForEntity(
-                SERVER_URL + ":" + port + "/mapa/9999",
-                Object.class);
+    JwtAuthenticationResponse user = login("user@local", "user123");
+    RequestEntity<Void> request = RequestEntity.get(SERVER_URL + ":" + port + "/mapa/9999")
+        .header(HttpHeaders.AUTHORIZATION, "Bearer " + user.getToken()).build();
+    ResponseEntity<?> response = restTemplate.exchange(request, Object.class);
 
         assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
     }
@@ -117,10 +162,10 @@ public class MapaControladorIntegrationTest {
         request.setFilas(15);
         request.setColumnas(15);
 
-        ResponseEntity<String> response = restTemplate.postForEntity(
-                SERVER_URL + ":" + port + "/mapa/crear",
-                request,
-                String.class);
+    JwtAuthenticationResponse admin = login("admin@local", "admin123");
+    RequestEntity<CrearMapaRequest> req = RequestEntity.post(SERVER_URL + ":" + port + "/mapa/crear")
+        .header(HttpHeaders.AUTHORIZATION, "Bearer " + admin.getToken()).body(request);
+    ResponseEntity<String> response = restTemplate.exchange(req, String.class);
 
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
         assertNotNull(response.getBody());
@@ -132,11 +177,10 @@ public class MapaControladorIntegrationTest {
 
     @Test
     void testBorrarMapa_DebeRetornar200() {
-        ResponseEntity<String> response = restTemplate.exchange(
-                SERVER_URL + ":" + port + "/mapa/" + mapa.getId(),
-                org.springframework.http.HttpMethod.DELETE,
-                null,
-                String.class);
+    JwtAuthenticationResponse admin = login("admin@local", "admin123");
+    RequestEntity<Void> req = RequestEntity.delete(SERVER_URL + ":" + port + "/mapa/" + mapa.getId())
+        .header(HttpHeaders.AUTHORIZATION, "Bearer " + admin.getToken()).build();
+    ResponseEntity<String> response = restTemplate.exchange(req, String.class);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         

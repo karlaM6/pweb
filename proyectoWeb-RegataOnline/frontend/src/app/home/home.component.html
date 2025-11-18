@@ -1,4 +1,13 @@
 <div class="home-container">
+  <div class="topbar">
+    <div class="auth-controls">
+      <a *ngIf="!isAuthenticated()" routerLink="/login" class="btn-login">Iniciar sesión</a>
+      <div *ngIf="isAuthenticated()" class="logged">
+        <span class="user-email">{{ getEmail() }}</span>
+        <button (click)="logout()" class="btn-logout">Cerrar sesión</button>
+      </div>
+    </div>
+  </div>
   <div class="hero-section">
     <div class="hero-content">
       <h1 class="hero-title">⛵ Regata Online</h1>
@@ -50,6 +59,9 @@
             Ir a Barcos
             <span class="btn-arrow">→</span>
           </a>
+          <div *ngIf="isAdmin()" class="admin-actions">
+            <a routerLink="/barco/create" class="btn btn-small btn-outline">Crear Barco</a>
+          </div>
         </div>
       </div>
 
@@ -72,6 +84,9 @@
             Ir a Jugadores
             <span class="btn-arrow">→</span>
           </a>
+          <div *ngIf="isAdmin()" class="admin-actions">
+            <a routerLink="/jugador/create" class="btn btn-small btn-outline">Crear Jugador</a>
+          </div>
         </div>
       </div>
 
@@ -94,6 +109,9 @@
             Ir a Modelos
             <span class="btn-arrow">→</span>
           </a>
+          <div *ngIf="isAdmin()" class="admin-actions">
+            <a routerLink="/modelo/create" class="btn btn-small btn-outline">Crear Modelo</a>
+          </div>
         </div>
       </div>
     </div>

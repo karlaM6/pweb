@@ -19,6 +19,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.security.access.annotation.Secured;
+import co.edu.javeriana.proyectoWeb.RegataOnline.model.Role;
 
 @RestController
 @RequestMapping("/barco/modelos")   
@@ -41,6 +43,7 @@ public class BarcoModeloControlador {
         return barcoServicio.getBarcoModelo(barcoId).orElseThrow();
     }
 
+    @Secured({ Role.Code.ADMIN })
     @PutMapping
     @Operation(summary = "Actualizar modelo del barco", description = "Actualiza el modelo asignado a un barco específico")
     @ApiResponses(value = {

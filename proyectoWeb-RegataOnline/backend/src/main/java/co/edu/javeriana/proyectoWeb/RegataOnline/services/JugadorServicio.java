@@ -14,6 +14,10 @@ import co.edu.javeriana.proyectoWeb.RegataOnline.mapper.JugadorMapper;
 import co.edu.javeriana.proyectoWeb.RegataOnline.model.Barco;
 import co.edu.javeriana.proyectoWeb.RegataOnline.model.Jugador;
 import co.edu.javeriana.proyectoWeb.RegataOnline.repository.JugadorRepositorio;
+import java.util.Optional;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 @Service
 public class JugadorServicio {
@@ -54,7 +58,31 @@ public class JugadorServicio {
         }
     }
 
+
     public List<JugadorDTO> buscarJugadoresPorNombre(String searchText) {
-        return jugadorRepositorio.findByNombreContainingIgnoreCase(searchText).stream().map(JugadorMapper::toDTO).toList();
+        return jugadorRepositorio.buscarJugadoresPorNombre(searchText).stream().map(JugadorMapper::toDTO).toList();
+    }
+    
+    public JugadorDTO userDetailsService(String nombre) {
+        Jugador jugador = jugadorRepositorio.buscarJugadoresPorNombre(nombre)
+                .stream()
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+        return JugadorMapper.toDTO(jugador);
+    }
+
+    /**
+     * Devuelve un UserDetailsService compatible con Spring Security.
+     * Carga el Jugador por email (username) y devuelve la entidad Jugador
+     * que implementa UserDetails.
+     */
+    public UserDetailsService userDetailsService() {
+        return new UserDetailsService() {
+            @Override
+            public UserDetails loadUserByUsername(String username) {
+                return jugadorRepositorio.findByEmail(username)
+                        .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+            }
+        };
     }
 }

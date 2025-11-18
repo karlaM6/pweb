@@ -3,6 +3,14 @@ package co.edu.javeriana.proyectoWeb.RegataOnline.controller;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.RequestEntity;
+import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpStatus;
+import co.edu.javeriana.proyectoWeb.RegataOnline.dto.JwtAuthenticationResponse;
+import co.edu.javeriana.proyectoWeb.RegataOnline.dto.LoginDTO;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import co.edu.javeriana.proyectoWeb.RegataOnline.model.Role;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
@@ -49,6 +57,9 @@ public class JugadorControladorIntegrationTest {
     @Autowired
     private ObjectMapper objectMapper;
 
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
     private Jugador jugador;
 
     @BeforeEach
@@ -57,16 +68,42 @@ public class JugadorControladorIntegrationTest {
         barcoRepo.deleteAll();
         jugadorRepo.deleteAll();
 
+        // create test users
+        Jugador admin = new Jugador();
+        admin.setNombre("Admin");
+        admin.setEmail("admin@local");
+        admin.setPassword(passwordEncoder.encode("admin123"));
+        admin.setRole(Role.ADMIN);
+        jugadorRepo.save(admin);
+
+        Jugador user = new Jugador();
+        user.setNombre("User");
+        user.setEmail("user@local");
+        user.setPassword(passwordEncoder.encode("user123"));
+        user.setRole(Role.USER);
+        jugadorRepo.save(user);
+
         jugador = new Jugador();
         jugador.setNombre("JugadorTest");
         jugador = jugadorRepo.save(jugador);
     }
 
+    private JwtAuthenticationResponse login(String email, String password) {
+        RequestEntity<LoginDTO> request = RequestEntity.post(SERVER_URL + ":" + port + "/auth/login")
+                .body(new LoginDTO(email, password));
+        ResponseEntity<JwtAuthenticationResponse> jwtResponse = restTemplate.exchange(request,
+                JwtAuthenticationResponse.class);
+        JwtAuthenticationResponse body = jwtResponse.getBody();
+        assertNotNull(body);
+        return body;
+    }
+
     @Test
     void testListarJugadores_DebeRetornar200() {
-        ResponseEntity<String> response = restTemplate.getForEntity(
-                SERVER_URL + ":" + port + "/jugador/list",
-                String.class);
+    JwtAuthenticationResponse user = login("user@local", "user123");
+    RequestEntity<Void> request = RequestEntity.get(SERVER_URL + ":" + port + "/jugador/list")
+        .header(HttpHeaders.AUTHORIZATION, "Bearer " + user.getToken()).build();
+    ResponseEntity<String> response = restTemplate.exchange(request, String.class);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertNotNull(response.getBody());
@@ -75,9 +112,10 @@ public class JugadorControladorIntegrationTest {
 
     @Test
     void testBuscarJugadorPorId_DebeRetornar200() throws Exception {
-        ResponseEntity<String> response = restTemplate.getForEntity(
-                SERVER_URL + ":" + port + "/jugador/" + jugador.getId(),
-                String.class);
+    JwtAuthenticationResponse user = login("user@local", "user123");
+    RequestEntity<Void> request = RequestEntity.get(SERVER_URL + ":" + port + "/jugador/" + jugador.getId())
+        .header(HttpHeaders.AUTHORIZATION, "Bearer " + user.getToken()).build();
+    ResponseEntity<String> response = restTemplate.exchange(request, String.class);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertNotNull(response.getBody());
@@ -89,9 +127,10 @@ public class JugadorControladorIntegrationTest {
 
     @Test
     void testBuscarJugadorPorIdInexistente_DebeRetornarEmpty() throws Exception {
-        ResponseEntity<String> response = restTemplate.getForEntity(
-                SERVER_URL + ":" + port + "/jugador/9999",
-                String.class);
+    JwtAuthenticationResponse user = login("user@local", "user123");
+    RequestEntity<Void> request = RequestEntity.get(SERVER_URL + ":" + port + "/jugador/9999")
+        .header(HttpHeaders.AUTHORIZATION, "Bearer " + user.getToken()).build();
+    ResponseEntity<String> response = restTemplate.exchange(request, String.class);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertNotNull(response.getBody());
@@ -102,10 +141,10 @@ public class JugadorControladorIntegrationTest {
         JugadorDTO nuevoJugador = new JugadorDTO();
         nuevoJugador.setNombre("NuevoJugador");
 
-        ResponseEntity<String> response = restTemplate.postForEntity(
-                SERVER_URL + ":" + port + "/jugador",
-                nuevoJugador,
-                String.class);
+    JwtAuthenticationResponse admin = login("admin@local", "admin123");
+    RequestEntity<JugadorDTO> request = RequestEntity.post(SERVER_URL + ":" + port + "/jugador")
+        .header(HttpHeaders.AUTHORIZATION, "Bearer " + admin.getToken()).body(nuevoJugador);
+    ResponseEntity<String> response = restTemplate.exchange(request, String.class);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         
@@ -119,11 +158,10 @@ public class JugadorControladorIntegrationTest {
         jugadorActualizado.setId(jugador.getId());
         jugadorActualizado.setNombre("JugadorActualizado");
 
-        ResponseEntity<String> response = restTemplate.exchange(
-                SERVER_URL + ":" + port + "/jugador",
-                org.springframework.http.HttpMethod.PUT,
-                new org.springframework.http.HttpEntity<>(jugadorActualizado),
-                String.class);
+    JwtAuthenticationResponse admin = login("admin@local", "admin123");
+    RequestEntity<JugadorDTO> request = RequestEntity.put(SERVER_URL + ":" + port + "/jugador")
+        .header(HttpHeaders.AUTHORIZATION, "Bearer " + admin.getToken()).body(jugadorActualizado);
+    ResponseEntity<String> response = restTemplate.exchange(request, String.class);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         
@@ -134,11 +172,10 @@ public class JugadorControladorIntegrationTest {
 
     @Test
     void testBorrarJugador_DebeRetornar200() {
-        ResponseEntity<String> response = restTemplate.exchange(
-                SERVER_URL + ":" + port + "/jugador/" + jugador.getId(),
-                org.springframework.http.HttpMethod.DELETE,
-                null,
-                String.class);
+    JwtAuthenticationResponse admin = login("admin@local", "admin123");
+    RequestEntity<Void> request = RequestEntity.delete(SERVER_URL + ":" + port + "/jugador/" + jugador.getId())
+        .header(HttpHeaders.AUTHORIZATION, "Bearer " + admin.getToken()).build();
+    ResponseEntity<String> response = restTemplate.exchange(request, String.class);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         

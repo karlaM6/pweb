@@ -22,6 +22,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
+import co.edu.javeriana.proyectoWeb.RegataOnline.model.Role;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -38,6 +40,7 @@ public class ModeloControlador {
 
     private Logger log = LoggerFactory.getLogger(getClass());
 
+    @Secured({ Role.Code.USER, Role.Code.ADMIN })
     @GetMapping("/list")
     @Operation(summary = "Listar todos los modelos", description = "Obtiene una lista completa de todos los modelos de barcos registrados en el sistema")
     @ApiResponse(responseCode = "200", description = "Lista de modelos obtenida exitosamente")
@@ -45,6 +48,7 @@ public class ModeloControlador {
         return modeloServicio.listarModelos();
     }
 
+    @Secured({ Role.Code.USER, Role.Code.ADMIN })
     @GetMapping("/list/{page}")
     @Operation(summary = "Listar modelos con paginación", description = "Obtiene una lista de modelos paginada (5 por página). El número de página debe ser mayor o igual a 0.")
     @ApiResponses(value = {
@@ -62,6 +66,7 @@ public class ModeloControlador {
         }
     }
 
+    @Secured({ Role.Code.USER, Role.Code.ADMIN })
     @GetMapping("/search")
     @Operation(summary = "Buscar modelos por nombre", description = "Busca modelos que coincidan con el texto proporcionado en el nombre.")
     @ApiResponses(value = {
@@ -83,6 +88,7 @@ public class ModeloControlador {
         }
     }
 
+    @Secured({ Role.Code.USER, Role.Code.ADMIN })
     @GetMapping("{id}")
     @Operation(summary = "Buscar modelo por ID", description = "Obtiene los detalles de un modelo específico mediante su identificador único")
     @ApiResponses(value = {
@@ -95,6 +101,7 @@ public class ModeloControlador {
         return modeloServicio.buscarModelo(id).orElseThrow();
     }
 
+    @Secured({ Role.Code.ADMIN })
     @PostMapping
     @Operation(summary = "Crear un nuevo modelo", description = "Registra un nuevo modelo de barco en el sistema con la información proporcionada")
     @ApiResponses(value = {
@@ -107,6 +114,7 @@ public class ModeloControlador {
         return modeloServicio.guardarModelo(modeloDTO);
     }
 
+    @Secured({ Role.Code.ADMIN })
     @PutMapping
     @Operation(summary = "Actualizar un modelo existente", description = "Actualiza la información de un modelo existente en el sistema")
     @ApiResponses(value = {
@@ -120,6 +128,7 @@ public class ModeloControlador {
         return modeloServicio.guardarModelo(modeloDTO);
     }
 
+    @Secured({ Role.Code.ADMIN })
     @DeleteMapping("{id}")
     @Operation(summary = "Eliminar un modelo", description = "Elimina permanentemente un modelo del sistema mediante su identificador único")
     @ApiResponses(value = {

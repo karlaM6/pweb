@@ -9,18 +9,30 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import co.edu.javeriana.proyectoWeb.RegataOnline.model.Barco;
 import co.edu.javeriana.proyectoWeb.RegataOnline.model.Celda;
 import co.edu.javeriana.proyectoWeb.RegataOnline.model.Jugador;
 import co.edu.javeriana.proyectoWeb.RegataOnline.model.Mapa;
 import co.edu.javeriana.proyectoWeb.RegataOnline.model.Modelo;
+import co.edu.javeriana.proyectoWeb.RegataOnline.model.Role;
 import co.edu.javeriana.proyectoWeb.RegataOnline.repository.BarcoRepositorio;
 import co.edu.javeriana.proyectoWeb.RegataOnline.repository.CeldaRepositorio;
 import co.edu.javeriana.proyectoWeb.RegataOnline.repository.JugadorRepositorio;
 import co.edu.javeriana.proyectoWeb.RegataOnline.repository.MapaRepositorio;
 import co.edu.javeriana.proyectoWeb.RegataOnline.repository.ModeloRepositorio;
 
+@Configuration
+// https://www.baeldung.com/spring-junit-prevent-runner-beans-testing-execution
+// https://www.baeldung.com/spring-profiles
+
+// mvn spring-boot:run -Dspring-boot.run.profiles=default
+@Profile({ "default" })
 
 @Component
 public class DbInitializer implements CommandLineRunner {
@@ -59,7 +71,37 @@ public class DbInitializer implements CommandLineRunner {
     public void run(String... args) throws Exception {
         List<Jugador> jugadores = new ArrayList<>();
         for(int i = 0; i < 5; i++) {
-            Jugador jugador = jugadorRepositorio.save(new Jugador("Jugador " + i));
+            Jugador jugador = new Jugador();
+            // Try common setter names first, then fallback to setting fields via reflection
+            try {
+                try {
+                    // setNombre(String)
+                    jugador.getClass().getMethod("setNombre", String.class).invoke(jugador, "Jugador " + i);
+                } catch (NoSuchMethodException e1) {
+                    try {
+                        // setName(String)
+                        jugador.getClass().getMethod("setName", String.class).invoke(jugador, "Jugador " + i);
+                    } catch (NoSuchMethodException e2) {
+                        // try fields: nombre or name
+                        try {
+                            java.lang.reflect.Field f = jugador.getClass().getDeclaredField("nombre");
+                            f.setAccessible(true);
+                            f.set(jugador, "Jugador " + i);
+                        } catch (NoSuchFieldException | IllegalAccessException e3) {
+                            try {
+                                java.lang.reflect.Field f2 = jugador.getClass().getDeclaredField("name");
+                                f2.setAccessible(true);
+                                f2.set(jugador, "Jugador " + i);
+                            } catch (NoSuchFieldException | IllegalAccessException e4) {
+                                // could not set name; proceed without setting
+                            }
+                        }
+                    }
+                }
+            } catch (IllegalAccessException | java.lang.reflect.InvocationTargetException ex) {
+                // ignore and proceed with default instance
+            }
+            jugador = jugadorRepositorio.save(jugador);
             jugadores.add(jugador);
         }
         for(int i = 0; i < 10; i++) {

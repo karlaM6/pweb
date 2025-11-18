@@ -3,6 +3,14 @@ package co.edu.javeriana.proyectoWeb.RegataOnline.controller;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.RequestEntity;
+import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpStatus;
+import co.edu.javeriana.proyectoWeb.RegataOnline.dto.JwtAuthenticationResponse;
+import co.edu.javeriana.proyectoWeb.RegataOnline.dto.LoginDTO;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import co.edu.javeriana.proyectoWeb.RegataOnline.model.Role;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
@@ -52,6 +60,9 @@ public class PartidaControladorIntegrationTest {
     @Autowired
     private ObjectMapper objectMapper;
 
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
     private Jugador jugador;
     private Mapa mapa;
     private Barco barco;
@@ -68,9 +79,25 @@ public class PartidaControladorIntegrationTest {
            mapaRepo.deleteAll();
 
         
-        jugador = new Jugador();
-        jugador.setNombre("JugadorTest");
-        jugador = jugadorRepo.save(jugador);
+    // create test users
+    jugadorRepo.deleteAll();
+    Jugador admin = new Jugador();
+    admin.setNombre("Admin");
+    admin.setEmail("admin@local");
+    admin.setPassword(passwordEncoder.encode("admin123"));
+    admin.setRole(Role.ADMIN);
+    jugadorRepo.save(admin);
+
+    Jugador user = new Jugador();
+    user.setNombre("User");
+    user.setEmail("user@local");
+    user.setPassword(passwordEncoder.encode("user123"));
+    user.setRole(Role.USER);
+    jugadorRepo.save(user);
+
+    jugador = new Jugador();
+    jugador.setNombre("JugadorTest");
+    jugador = jugadorRepo.save(jugador);
 
        
         mapa = new Mapa(10, 10);
@@ -86,6 +113,16 @@ public class PartidaControladorIntegrationTest {
         barco = barcoRepo.save(barco);
     }
 
+    private JwtAuthenticationResponse login(String email, String password) {
+    RequestEntity<LoginDTO> request = RequestEntity.post(SERVER_URL + ":" + port + "/auth/login")
+        .body(new LoginDTO(email, password));
+    ResponseEntity<JwtAuthenticationResponse> jwtResponse = restTemplate.exchange(request,
+        JwtAuthenticationResponse.class);
+    JwtAuthenticationResponse body = jwtResponse.getBody();
+    assertNotNull(body);
+    return body;
+    }
+
     @Test
     void testCrearPartida_DebeRetornar201() throws Exception {
         CrearPartidaRequest request = new CrearPartidaRequest();
@@ -93,10 +130,10 @@ public class PartidaControladorIntegrationTest {
         request.setMapaId(mapa.getId());
         request.setBarcoId(barco.getId());
 
-        ResponseEntity<String> response = restTemplate.postForEntity(
-                SERVER_URL + ":" + port + "/partida/crear",
-                request,
-                String.class);
+    JwtAuthenticationResponse user = login("user@local", "user123");
+    RequestEntity<CrearPartidaRequest> req = RequestEntity.post(SERVER_URL + ":" + port + "/partida/crear")
+        .header(HttpHeaders.AUTHORIZATION, "Bearer " + user.getToken()).body(request);
+    ResponseEntity<String> response = restTemplate.exchange(req, String.class);
 
         System.out.println("Response Body: " + response.getBody());
         System.out.println("Response Status: " + response.getStatusCode());
@@ -110,9 +147,10 @@ public class PartidaControladorIntegrationTest {
 
     @Test
     void testObtenerPartidaActiva_CuandoNoExiste_DebeRetornar404() {
-    ResponseEntity<?> response = restTemplate.getForEntity(
-        SERVER_URL + ":" + port + "/partida/activa/" + jugador.getId(), 
-        Object.class);
+    JwtAuthenticationResponse user = login("user@local", "user123");
+    RequestEntity<Void> req = RequestEntity.get(SERVER_URL + ":" + port + "/partida/activa/" + jugador.getId())
+            .header(HttpHeaders.AUTHORIZATION, "Bearer " + user.getToken()).build();
+    ResponseEntity<?> response = restTemplate.exchange(req, Object.class);
     assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
     }
 }

@@ -3,6 +3,10 @@ package co.edu.javeriana.proyectoWeb.RegataOnline.controller;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.RequestEntity;
+import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpStatus;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
@@ -20,6 +24,12 @@ import co.edu.javeriana.proyectoWeb.RegataOnline.repository.PartidaRepositorio;
 import co.edu.javeriana.proyectoWeb.RegataOnline.dto.BarcoDTO;
 import co.edu.javeriana.proyectoWeb.RegataOnline.model.Barco;
 import co.edu.javeriana.proyectoWeb.RegataOnline.model.Modelo;
+import co.edu.javeriana.proyectoWeb.RegataOnline.model.Jugador;
+import co.edu.javeriana.proyectoWeb.RegataOnline.model.Role;
+import co.edu.javeriana.proyectoWeb.RegataOnline.repository.JugadorRepositorio;
+import co.edu.javeriana.proyectoWeb.RegataOnline.dto.JwtAuthenticationResponse;
+import co.edu.javeriana.proyectoWeb.RegataOnline.dto.LoginDTO;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.util.List;
@@ -42,6 +52,12 @@ public class BarcoControladorIntegrationTest {
     private BarcoRepositorio barcoRepo;
 
     @Autowired
+    private JugadorRepositorio jugadorRepo;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
+    @Autowired
     private ModeloRepositorio modeloRepo;
 
     @Autowired
@@ -59,6 +75,22 @@ public class BarcoControladorIntegrationTest {
         barcoRepo.deleteAll();
         modeloRepo.deleteAll();
 
+        // clear and create test users (one ADMIN and one USER)
+        jugadorRepo.deleteAll();
+        Jugador admin = new Jugador();
+        admin.setNombre("Admin");
+        admin.setEmail("admin@local");
+        admin.setPassword(passwordEncoder.encode("admin123"));
+        admin.setRole(Role.ADMIN);
+        jugadorRepo.save(admin);
+
+        Jugador user = new Jugador();
+        user.setNombre("User");
+        user.setEmail("user@local");
+        user.setPassword(passwordEncoder.encode("user123"));
+        user.setRole(Role.USER);
+        jugadorRepo.save(user);
+
         modelo = new Modelo();
         modelo.setNombreModelo("ModeloTest");
         modelo.setColor("Rojo");
@@ -72,11 +104,22 @@ public class BarcoControladorIntegrationTest {
         barco = barcoRepo.save(barco);
     }
 
+    private JwtAuthenticationResponse login(String email, String password) {
+        RequestEntity<LoginDTO> request = RequestEntity.post(SERVER_URL + ":" + port + "/auth/login")
+                .body(new LoginDTO(email, password));
+        ResponseEntity<JwtAuthenticationResponse> jwtResponse = restTemplate.exchange(request,
+                JwtAuthenticationResponse.class);
+        JwtAuthenticationResponse body = jwtResponse.getBody();
+        assertNotNull(body);
+        return body;
+    }
+
     @Test
     void testListarBarcos_DebeRetornar200() {
-        ResponseEntity<String> response = restTemplate.getForEntity(
-                SERVER_URL + ":" + port + "/barco/list",
-                String.class);
+    JwtAuthenticationResponse user = login("user@local", "user123");
+    RequestEntity<Void> request = RequestEntity.get(SERVER_URL + ":" + port + "/barco/list")
+        .header(HttpHeaders.AUTHORIZATION, "Bearer " + user.getToken()).build();
+    ResponseEntity<String> response = restTemplate.exchange(request, String.class);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertNotNull(response.getBody());
@@ -85,9 +128,10 @@ public class BarcoControladorIntegrationTest {
 
     @Test
     void testBuscarBarcoPorId_DebeRetornar200() throws Exception {
-        ResponseEntity<String> response = restTemplate.getForEntity(
-                SERVER_URL + ":" + port + "/barco/" + barco.getId(),
-                String.class);
+    JwtAuthenticationResponse user = login("user@local", "user123");
+    RequestEntity<Void> request = RequestEntity.get(SERVER_URL + ":" + port + "/barco/" + barco.getId())
+        .header(HttpHeaders.AUTHORIZATION, "Bearer " + user.getToken()).build();
+    ResponseEntity<String> response = restTemplate.exchange(request, String.class);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertNotNull(response.getBody());
@@ -99,18 +143,21 @@ public class BarcoControladorIntegrationTest {
 
     @Test
     void testBuscarBarcoPorIdInexistente_DebeRetornarError() {
-        ResponseEntity<?> response = restTemplate.getForEntity(
-                SERVER_URL + ":" + port + "/barco/9999",
-                Object.class);
+    JwtAuthenticationResponse user = login("user@local", "user123");
+    RequestEntity<Void> request = RequestEntity.get(SERVER_URL + ":" + port + "/barco/9999")
+        .header(HttpHeaders.AUTHORIZATION, "Bearer " + user.getToken()).build();
+    ResponseEntity<?> response = restTemplate.exchange(request, Object.class);
 
         assertNotEquals(HttpStatus.OK, response.getStatusCode());
     }
 
     @Test
     void testBuscarBarcosPorNombre_DebeRetornar200() {
-        ResponseEntity<String> response = restTemplate.getForEntity(
-                SERVER_URL + ":" + port + "/barco/search?searchText=BarcoTest",
-                String.class);
+    JwtAuthenticationResponse user = login("user@local", "user123");
+    RequestEntity<Void> request = RequestEntity.get(
+        SERVER_URL + ":" + port + "/barco/search?searchText=BarcoTest")
+        .header(HttpHeaders.AUTHORIZATION, "Bearer " + user.getToken()).build();
+    ResponseEntity<String> response = restTemplate.exchange(request, String.class);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertNotNull(response.getBody());
@@ -119,9 +166,11 @@ public class BarcoControladorIntegrationTest {
 
     @Test
     void testBuscarBarcosPorNombreVacio_DebeRetornarError() {
-        ResponseEntity<?> response = restTemplate.getForEntity(
-                SERVER_URL + ":" + port + "/barco/search?searchText=",
-                Object.class);
+    JwtAuthenticationResponse user = login("user@local", "user123");
+    RequestEntity<Void> request = RequestEntity.get(
+        SERVER_URL + ":" + port + "/barco/search?searchText=")
+        .header(HttpHeaders.AUTHORIZATION, "Bearer " + user.getToken()).build();
+    ResponseEntity<?> response = restTemplate.exchange(request, Object.class);
 
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
     }
@@ -133,10 +182,10 @@ public class BarcoControladorIntegrationTest {
         nuevoBarco.setPosicionX(5);
         nuevoBarco.setPosicionY(5);
 
-        ResponseEntity<String> response = restTemplate.postForEntity(
-                SERVER_URL + ":" + port + "/barco",
-                nuevoBarco,
-                String.class);
+    JwtAuthenticationResponse admin = login("admin@local", "admin123");
+    RequestEntity<BarcoDTO> request = RequestEntity.post(SERVER_URL + ":" + port + "/barco")
+        .header(HttpHeaders.AUTHORIZATION, "Bearer " + admin.getToken()).body(nuevoBarco);
+    ResponseEntity<String> response = restTemplate.exchange(request, String.class);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         
@@ -152,11 +201,10 @@ public class BarcoControladorIntegrationTest {
         barcoActualizado.setPosicionX(10);
         barcoActualizado.setPosicionY(10);
 
-        ResponseEntity<String> response = restTemplate.exchange(
-                SERVER_URL + ":" + port + "/barco",
-                org.springframework.http.HttpMethod.PUT,
-                new org.springframework.http.HttpEntity<>(barcoActualizado),
-                String.class);
+    JwtAuthenticationResponse admin = login("admin@local", "admin123");
+    RequestEntity<BarcoDTO> request = RequestEntity.put(SERVER_URL + ":" + port + "/barco")
+        .header(HttpHeaders.AUTHORIZATION, "Bearer " + admin.getToken()).body(barcoActualizado);
+    ResponseEntity<String> response = restTemplate.exchange(request, String.class);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         
@@ -167,11 +215,10 @@ public class BarcoControladorIntegrationTest {
 
     @Test
     void testBorrarBarco_DebeRetornar200() {
-        ResponseEntity<String> response = restTemplate.exchange(
-                SERVER_URL + ":" + port + "/barco/" + barco.getId(),
-                org.springframework.http.HttpMethod.DELETE,
-                null,
-                String.class);
+    JwtAuthenticationResponse admin = login("admin@local", "admin123");
+    RequestEntity<Void> request = RequestEntity.delete(SERVER_URL + ":" + port + "/barco/" + barco.getId())
+        .header(HttpHeaders.AUTHORIZATION, "Bearer " + admin.getToken()).build();
+    ResponseEntity<String> response = restTemplate.exchange(request, String.class);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         
