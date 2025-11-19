@@ -47,8 +47,8 @@ export const routes: Routes = [
     { path: 'mapa/create', component: MapaCreateComponent, canActivate: [authGuard], data: { roles: ['ADMIN'] } },
     { path: 'mapa/view/:id', component: MapaViewComponent, canActivate: [authGuard] },
 
-    // Partidas: require authentication for menu/crear/juego
-    { path: 'partida/menu', component: PartidaMenuComponent, canActivate: [authGuard] },
-    { path: 'partida/crear', component: PartidaCrearComponent, canActivate: [authGuard] },
-    { path: 'partida/juego/:id', component: PartidaJuegoComponent, canActivate: [authGuard] }
+    // Partidas: only USERs can jugar (admin cannot)
+    { path: 'partida/menu', component: PartidaMenuComponent, canActivate: [authGuard], data: { roles: ['USER'] } },
+    { path: 'partida/crear', component: PartidaCrearComponent, canActivate: [authGuard], data: { roles: ['USER'] } },
+    { path: 'partida/juego/:id', component: PartidaJuegoComponent, canActivate: [authGuard], data: { roles: ['USER'] } }
 ];

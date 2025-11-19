@@ -105,10 +105,12 @@ public class BarcoControlador {
         @ApiResponse(responseCode = "200", description = "Barco encontrado exitosamente"),
         @ApiResponse(responseCode = "404", description = "Barco no encontrado")
     })
-    public BarcoDTO buscarBarco(
+    public ResponseEntity<?> buscarBarco(
         @Parameter(description = "Identificador único del barco", example = "1", required = true)
         @PathVariable("id") Long id){
-        return barcoServicio.buscarBarco(id).orElseThrow();
+        return barcoServicio.buscarBarco(id)
+            .<ResponseEntity<?>>map(ResponseEntity::ok)
+            .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorDTO("Barco no encontrado")));
     }
 
     @Secured({Role.Code.ADMIN}) 

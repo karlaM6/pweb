@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { Modelo } from '../../model/modelo';
+import { AuthService } from '../../shared/auth.service';
 
 @Component({
     selector: 'app-modelo-lista',
@@ -15,6 +16,7 @@ import { Modelo } from '../../model/modelo';
 export class ModeloListaComponent {
   modelos = signal<Modelo[]>([]);
   modeloService = inject(ModeloService);
+  auth = inject(AuthService);
 
   ngOnInit(): void {
     this.cargarModelos();

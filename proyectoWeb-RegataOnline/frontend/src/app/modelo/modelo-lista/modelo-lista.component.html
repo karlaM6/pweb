@@ -1,6 +1,6 @@
 <h1>Lista de Modelos</h1>
 <div class="header-actions">
-    <a [routerLink]="['/modelo/create']" class="btn-create">+ Crear Nuevo Modelo</a>
+    <a *ngIf="auth.isAdmin()" [routerLink]="['/modelo/create']" class="btn-create">+ Crear Nuevo Modelo</a>
 </div>
 <ul>
     @for(m of modelos(); track $index) {
@@ -11,8 +11,8 @@
             </div>
             <div class="actions">
                 <a [routerLink]="['/modelo/view', m.id]">Ver</a>
-                <a [routerLink]="['/modelo/edit', m.id]">Editar</a>
-                <button class="btn-delete" (click)="eliminar(m.id, m.nombreModelo)">Eliminar</button>
+                <a *ngIf="auth.isAdmin()" [routerLink]="['/modelo/edit', m.id]">Editar</a>
+                <button *ngIf="auth.isAdmin()" class="btn-delete" (click)="eliminar(m.id, m.nombreModelo)">Eliminar</button>
             </div>
         </li>
     }

@@ -4,6 +4,7 @@ import { Jugador } from '../../model/jugador';
 import { JugadorService } from '../../shared/jugador.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { switchMap } from 'rxjs';
+import { AuthService } from '../../shared/auth.service';
 
 @Component({
   selector: 'app-jugador-view',
@@ -15,6 +16,7 @@ import { switchMap } from 'rxjs';
 export class JugadorViewComponent {
   jugador = signal<Jugador>({});
   jugadorService = inject(JugadorService);
+  auth = inject(AuthService);
   route = inject(ActivatedRoute);
   router = inject(Router);
 

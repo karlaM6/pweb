@@ -1,6 +1,6 @@
 <h1>Lista de Jugadores</h1>
 <div class="header-actions">
-    <a [routerLink]="['/jugador/create']" class="btn-create">+ Crear Nuevo Jugador</a>
+    <a *ngIf="auth.isAdmin()" [routerLink]="['/jugador/create']" class="btn-create">+ Crear Nuevo Jugador</a>
 </div>
 <ul>
     @for(j of jugadores(); track $index) {
@@ -8,8 +8,8 @@
             <span>{{j.id}} - {{j.nombre}}</span>
             <div class="actions">
                 <a [routerLink]="['/jugador/view', j.id]">Ver</a>
-                <a [routerLink]="['/jugador/edit', j.id]">Editar</a>
-                <button class="btn-delete" (click)="eliminar(j.id, j.nombre)">Eliminar</button>
+                <a *ngIf="auth.isAdmin()" [routerLink]="['/jugador/edit', j.id]">Editar</a>
+                <button *ngIf="auth.isAdmin()" class="btn-delete" (click)="eliminar(j.id, j.nombre)">Eliminar</button>
             </div>
         </li>
     }

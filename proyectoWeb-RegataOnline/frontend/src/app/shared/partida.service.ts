@@ -65,6 +65,10 @@ export class PartidaService {
     return this.http.put<Partida>(`${this.url}/${id}/finalizar`, {});
   }
 
+  reanudarPartida(id: number): Observable<Partida> {
+    return this.http.put<Partida>(`${this.url}/${id}/reanudar`, {});
+  }
+
   moverBarco(partidaId: number, aceleracionX: number, aceleracionY: number): Observable<Partida> {
     return this.http.put<Partida>(
       `${this.url}/${partidaId}/mover?aceleracionX=${aceleracionX}&aceleracionY=${aceleracionY}`, 

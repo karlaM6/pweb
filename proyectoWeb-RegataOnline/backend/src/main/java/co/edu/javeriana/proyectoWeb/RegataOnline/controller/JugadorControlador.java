@@ -51,6 +51,19 @@ public class JugadorControlador {
         return jugadorServicio.buscarJugador(id);
     }
 
+    @GetMapping("/email/{email}")
+    @Operation(summary = "Buscar jugador por email", description = "Obtiene los detalles de un jugador específico por su email")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Jugador encontrado exitosamente"),
+        @ApiResponse(responseCode = "404", description = "Jugador no encontrado")
+    })
+    @Secured({ Role.Code.USER, Role.Code.ADMIN })
+    public Optional<JugadorDTO> buscarJugadorPorEmail(
+        @Parameter(description = "Email del jugador", example = "jugador@example.com", required = true)
+        @PathVariable("email") String email) {
+        return jugadorServicio.findByEmail(email);
+    }
+
     @Secured({ Role.Code.ADMIN })
     @PostMapping
     @Operation(summary = "Crear un nuevo jugador", description = "Registra un nuevo jugador en el sistema")

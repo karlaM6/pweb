@@ -3,6 +3,7 @@ import { Barco } from '../../model/barco';
 import { BarcoService } from '../../shared/barco.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { switchMap } from 'rxjs';
+import { AuthService } from '../../shared/auth.service';
 
 @Component({
   selector: 'app-barco-view',
@@ -12,6 +13,7 @@ import { switchMap } from 'rxjs';
 })
 export class BarcoViewComponent {
   barcoService = inject(BarcoService);
+  auth = inject(AuthService);
 
   route = inject(ActivatedRoute);
 

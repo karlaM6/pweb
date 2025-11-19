@@ -1,0 +1,48 @@
+File /home/estudiante/Documents/pweb/proyectoWeb-RegataOnline/backend/mydatabase.mv.db, 161480 bytes, 0 MB
+00000 fileHeader H:2,block:12,blockSize:1000,chunk:2eda,created:198bf62551c,format:3,version:2eda,fletcher:e6de083a
+01000 fileHeader H:2,block:12,blockSize:1000,chunk:2eda,created:198bf62551c,format:3,version:2eda,fletcher:e6de083a
+
+12000 chunkHeader chunk:2eda,block:12,len:1,pages:6,max:9a0,map:49f2,next:18,root:bb6800000e2c3,time:1db2acc08,version:2eda,toc:870
++000b0 leaf, map 5, 2 entries, 175 bytes, maxLen c0
++0015f node, map 1, 2 entries, 34 bytes, maxLen 30
+    8 children @ chunk 2eda +00181
+    10 children @ chunk 2eda +002bf
++00181 leaf, map 1, 8 entries, 318 bytes, maxLen 180
++002bf leaf, map 1, 10 entries, 204 bytes, maxLen 100
++0038b node, map 0, 2 entries, 39 bytes, maxLen 30
+    6 children < chunk.2b0c @ chunk 2ed1 +03cc6
+    10 children >= null @ chunk 2eda +003b2
++003b2 leaf, map 0, 10 entries, 1214 bytes, maxLen 600
+    chunk.2ed1 = chunk:2ed1,block:13,len:5,pages:b,livePages:6,max:4eb0,liveMax:3200,map:49de,root:bb440000f27c3,time:1db27e088,unusedAtVersion:2ed5,version:2ed1,toc:444b,occupancy:2905
+    chunk.2ed4 = chunk:2ed4,block:1a,len:2,pages:7,livePages:1,max:1320,liveMax:c00,map:49df,next:1c,root:bb50000035703,time:1db2802e3,unusedAtVersion:2ed5,version:2ed4,toc:1164,occupancy:7d
+    chunk.2ed6 = chunk:2ed6,block:1d,len:4,pages:a,livePages:2,max:3e00,liveMax:c80,map:49f2,next:21,root:bb580000a8943,time:1db280773,unusedAtVersion:2ed9,version:2ed6,toc:2fbe,occupancy:fc03
+    chunk.2ed8 = chunk:2ed8,block:22,len:2,pages:20,livePages:0,max:20c0,liveMax:0,map:49f2,next:24,root:bb600000588c3,time:1db2811d9,unused:1db2acc08,unusedAtVersion:2ed9,version:2ed8,toc:1e31,occupancy:ffffffff
+    chunk.2ed9 = chunk:2ed9,block:24,len:2,pages:10,livePages:0,max:1610,liveMax:0,map:49f2,next:26,root:bb64000023f03,time:1db281473,unused:1db2acc08,unusedAtVersion:2ed9,version:2ed9,toc:11cd,occupancy:ffff
+    chunk.c0 = chunk:c0,block:2,len:2,pages:3,livePages:1,max:1620,liveMax:20,map:1bb,root:30000003da16,time:f72c5d3,unusedAtVersion:c0,version:c0,toc:14aa,occupancy:05
+    meta.id = 1
+    root.1 = bb680000057c3
+    root.2 = bb58000002c09
+    root.5 = bb68000002c0a
+map 0: 1253 bytes, 63%
+map 1: 556 bytes, 28%
+map 5: 175 bytes, 8%
++00f80 chunkFooter chunk:2eda,len:1,version:2eda,fletcher:edc41c3b
+ERROR illegal position 163840
+
+276c8 eof
+
+page size total: 1984 bytes, page count: 6, average page size: 330 bytes
+map 0: 1253 bytes, 63%
+map 1: 556 bytes, 28%
+map 5: 175 bytes, 8%
+ERROR: org.h2.mvstore.MVStoreException: File is corrupted - unable to recover a valid set of chunks [2.4.240/6]
+org.h2.mvstore.MVStoreException: File is corrupted - unable to recover a valid set of chunks [2.4.240/6]
+	at org.h2.mvstore.DataUtils.newMVStoreException(DataUtils.java:996)
+	at org.h2.mvstore.RandomAccessStore.readStoreHeader(RandomAccessStore.java:320)
+	at org.h2.mvstore.FileStore.start(FileStore.java:919)
+	at org.h2.mvstore.MVStore.<init>(MVStore.java:294)
+	at org.h2.mvstore.MVStore$Builder.open(MVStore.java:2164)
+	at org.h2.mvstore.MVStoreTool.info(MVStoreTool.java:358)
+	at org.h2.tools.Recover.process(Recover.java:245)
+	at org.h2.tools.Recover.runTool(Recover.java:138)
+	at org.h2.tools.Recover.main(Recover.java:104)

@@ -3,6 +3,7 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { switchMap } from 'rxjs';
 import { MapaService, Mapa, Celda } from '../../shared/mapa.service';
+import { AuthService } from '../../shared/auth.service';
 
 @Component({
   selector: 'app-mapa-view',
@@ -14,6 +15,7 @@ export class MapaViewComponent implements OnInit {
   mapaService = inject(MapaService);
   route = inject(ActivatedRoute);
   router = inject(Router);
+  auth = inject(AuthService);
 
   mapa = signal<Mapa | null>(null);
   matrizCeldas = signal<Celda[][]>([]);

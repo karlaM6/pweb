@@ -7,14 +7,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import co.edu.javeriana.proyectoWeb.RegataOnline.dto.BarcoDTO;
 import co.edu.javeriana.proyectoWeb.RegataOnline.dto.JugadorDTO;
-import co.edu.javeriana.proyectoWeb.RegataOnline.mapper.BarcoMapper;
 import co.edu.javeriana.proyectoWeb.RegataOnline.mapper.JugadorMapper;
 import co.edu.javeriana.proyectoWeb.RegataOnline.model.Barco;
 import co.edu.javeriana.proyectoWeb.RegataOnline.model.Jugador;
 import co.edu.javeriana.proyectoWeb.RegataOnline.repository.JugadorRepositorio;
-import java.util.Optional;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -84,5 +81,14 @@ public class JugadorServicio {
                         .orElseThrow(() -> new UsernameNotFoundException("User not found"));
             }
         };
+    }
+
+    /**
+     * Busca un jugador por su email.
+     * @param email El email del jugador.
+     * @return Un Optional con el JugadorDTO si se encuentra, o vacío si no.
+     */
+    public Optional<JugadorDTO> findByEmail(String email) {
+        return jugadorRepositorio.findByEmail(email).map(JugadorMapper::toDTO);
     }
 }

@@ -1,6 +1,6 @@
 <h1>Lista de Barcos</h1>
 <div class="header-actions">
-    <a [routerLink]="['/barco/create']" class="btn-create">+ Crear Nuevo Barco</a>
+    <a *ngIf="auth.isAdmin()" [routerLink]="['/barco/create']" class="btn-create">+ Crear Nuevo Barco</a>
 </div>
 <ul>
     @for(p of barcos(); track $index) {
@@ -8,8 +8,8 @@
             <span>{{p.id}} - {{p.nombre}}</span>
             <div class="actions">
                 <a [routerLink]="['/barco/view', p.id]">Ver</a>
-                <a [routerLink]="['/barco/edit', p.id]">Editar</a>
-                <button class="btn-delete" (click)="eliminar(p.id, p.nombre)">Eliminar</button>
+                <a *ngIf="auth.isAdmin()" [routerLink]="['/barco/edit', p.id]">Editar</a>
+                <button *ngIf="auth.isAdmin()" class="btn-delete" (click)="eliminar(p.id, p.nombre)">Eliminar</button>
             </div>
         </li>
     }

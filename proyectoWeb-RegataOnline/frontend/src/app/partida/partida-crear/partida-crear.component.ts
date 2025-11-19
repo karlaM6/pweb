@@ -68,9 +68,14 @@ export class PartidaCrearComponent {
   cargarBarcos(jugadorId: number): void {
     this.barcoService.findAll().subscribe({
       next: data => {
-        // Filtrar barcos del jugador
+        // Filtrar barcos del jugador. Si el jugador no tiene barcos propios aún,
+        // mostrar todos los barcos como fallback para que pueda iniciar la partida.
         const barcosJugador = data.filter(b => b.jugadorId === jugadorId);
-        this.barcos.set(barcosJugador);
+        if (barcosJugador.length > 0) {
+          this.barcos.set(barcosJugador);
+        } else {
+          this.barcos.set(data);
+        }
       },
       error: err => console.error('Error cargando barcos', err)
     });

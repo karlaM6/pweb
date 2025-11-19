@@ -13,7 +13,7 @@
       <h1 class="hero-title">⛵ Regata Online</h1>
       <p class="hero-subtitle">¿Listo para navegar?</p>
       
-      <div class="partida-buttons">
+      <div class="partida-buttons" *ngIf="!isAdmin()">
         <button routerLink="/partida/menu" class="btn-partida btn-crear">
           <span class="btn-icon">🎮</span>
           <span class="btn-text">

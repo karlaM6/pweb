@@ -68,6 +68,10 @@ public class PartidaServicio {
         Barco barco = barcoRepositorio.findById(request.getBarcoId())
             .orElseThrow(() -> new RuntimeException("Barco no encontrado con ID: " + request.getBarcoId()));
 
+        // Asegurar que el mismo barco no esté siendo usado en otra partida activa/pausada
+        partidaRepositorio.findByBarcoAndEstadoIn(barco, Arrays.asList("activa", "pausada"))
+            .ifPresent(p -> { throw new RuntimeException("El barco seleccionado ya está en uso en otra partida."); });
+
         // Validar que el barco pertenece al jugador
         if (barco.getJugador() != null && !barco.getJugador().getId().equals(jugador.getId())) {
             throw new RuntimeException("El barco no pertenece a este jugador");
@@ -158,6 +162,29 @@ public class PartidaServicio {
 
         partida.setEstado("terminada");
         partida = partidaRepositorio.save(partida);
+
+        return PartidaMapper.toDTO(partida);
+    }
+
+    /**
+     * Reanuda una partida pausada, dejándola en estado 'activa'
+     */
+    @Transactional
+    public PartidaDTO reanudarPartida(Long id) {
+        log.info("Reanudando partida {}", id);
+
+        Partida partida = partidaRepositorio.findById(id)
+            .orElseThrow(() -> new RuntimeException("Partida no encontrada con ID: " + id));
+
+        if ("terminada".equals(partida.getEstado())) {
+            throw new RuntimeException("No se puede reanudar una partida terminada");
+        }
+
+        // Si ya está activa, simplemente devolver
+        if (!"activa".equals(partida.getEstado())) {
+            partida.setEstado("activa");
+            partida = partidaRepositorio.save(partida);
+        }
 
         return PartidaMapper.toDTO(partida);
     }

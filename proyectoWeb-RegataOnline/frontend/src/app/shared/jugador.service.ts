@@ -18,6 +18,11 @@ export class JugadorService {
     return this.http.get<Jugador>(`${environment.baseUrl}/jugador/${id}`);
   }
 
+  findByEmail(email: string): Observable<Jugador> {
+    const encoded = encodeURIComponent(email);
+    return this.http.get<Jugador>(`${environment.baseUrl}/jugador/email/${encoded}`);
+  }
+
   update(jugador: Jugador): Observable<Jugador> {
     return this.http.put<Jugador>(`${environment.baseUrl}/jugador`,
        jugador,

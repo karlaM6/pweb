@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { Jugador } from '../../model/jugador';
 import { JugadorService } from '../../shared/jugador.service';
 import { RouterLink } from '@angular/router';
+import { AuthService } from '../../shared/auth.service';
 
 @Component({
   selector: 'app-jugador-lista',
@@ -16,6 +17,7 @@ export class JugadorListaComponent {
 
   jugadorClicked = output<Jugador>();
   jugadorService = inject(JugadorService);
+  auth = inject(AuthService);
 
   ngOnInit(): void {
     this.cargarJugadores();

@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { Barco } from '../../model/barco';
 import { BarcoService } from '../../shared/barco.service';
 import { RouterLink } from '@angular/router';
+import { AuthService } from '../../shared/auth.service';
 
 @Component({
   selector: 'app-barco-lista',
@@ -16,6 +17,7 @@ export class BarcoListaComponent {
 
   barcoClicked = output<Barco>();
   barcoService = inject(BarcoService);
+  auth = inject(AuthService);
 
   ngOnInit(): void {
     this.cargarBarcos();

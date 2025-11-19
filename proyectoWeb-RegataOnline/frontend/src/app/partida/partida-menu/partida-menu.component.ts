@@ -4,6 +4,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { PartidaService, Partida } from '../../shared/partida.service';
 import { JugadorService } from '../../shared/jugador.service';
+import { AuthService } from '../../shared/auth.service';
 import { Jugador } from '../../model/jugador';
 
 @Component({
@@ -16,6 +17,7 @@ export class PartidaMenuComponent {
   partidaService = inject(PartidaService);
   jugadorService = inject(JugadorService);
   router = inject(Router);
+  auth = inject(AuthService);
 
   jugadores = signal<Jugador[]>([]);
   jugadorSeleccionadoId = signal<number | null>(null);
@@ -24,29 +26,24 @@ export class PartidaMenuComponent {
   mensaje = signal<string>('');
 
   ngOnInit(): void {
-    this.cargarJugadores();
+    this.setLoggedInPlayer();
   }
 
-  cargarJugadores(): void {
-    this.jugadorService.findAll().subscribe({
-      next: data => this.jugadores.set(data),
-      error: err => console.error('Error cargando jugadores', err)
-    });
-  }
-
-  onJugadorSeleccionado(event: Event): void {
-    const select = event.target as HTMLSelectElement;
-    const jugadorId = Number(select.value);
-    
-    if (!jugadorId) {
-      this.jugadorSeleccionadoId.set(null);
-      this.partidaActiva.set(null);
-      this.mensaje.set('');
-      return;
+  setLoggedInPlayer(): void {
+    const loggedInPlayerId = this.auth.email(); // Assuming email uniquely identifies the player
+    if (loggedInPlayerId) {
+      this.jugadorService.findByEmail(loggedInPlayerId).subscribe({
+        next: (jugador: Jugador) => {
+          if (jugador.id !== undefined) {
+            this.jugadorSeleccionadoId.set(jugador.id);
+            this.buscarPartidaActiva(jugador.id);
+          } else {
+            console.error('Jugador ID is undefined');
+          }
+        },
+        error: (err: any) => console.error('Error fetching logged-in player', err)
+      });
     }
-
-    this.jugadorSeleccionadoId.set(jugadorId);
-    this.buscarPartidaActiva(jugadorId);
   }
 
   buscarPartidaActiva(jugadorId: number): void {
@@ -54,13 +51,12 @@ export class PartidaMenuComponent {
     this.mensaje.set('');
     
     this.partidaService.obtenerPartidaActiva(jugadorId).subscribe({
-      next: partida => {
+      next: (partida: Partida) => {
         this.partidaActiva.set(partida);
         this.mensaje.set('');
         this.cargando.set(false);
       },
       error: () => {
-        // No hay partida activa, esto es normal
         this.partidaActiva.set(null);
         this.mensaje.set('');
         this.cargando.set(false);
@@ -70,7 +66,7 @@ export class PartidaMenuComponent {
 
   iniciarNuevaPartida(): void {
     if (!this.jugadorSeleccionadoId()) {
-      alert('Por favor selecciona un jugador');
+      alert('No se encontró un jugador asociado a esta cuenta.');
       return;
     }
     
@@ -118,7 +114,7 @@ export class PartidaMenuComponent {
         alert('Partida finalizada exitosamente');
         this.partidaActiva.set(null);
       },
-      error: err => {
+      error: (err: any) => {
         console.error('Error al finalizar partida', err);
         alert('Error al finalizar la partida');
       }

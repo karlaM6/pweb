@@ -15,10 +15,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.access.annotation.Secured;
 
 import co.edu.javeriana.proyectoWeb.RegataOnline.dto.CrearPartidaRequest;
 import co.edu.javeriana.proyectoWeb.RegataOnline.dto.PartidaDTO;
 import co.edu.javeriana.proyectoWeb.RegataOnline.services.PartidaServicio;
+import co.edu.javeriana.proyectoWeb.RegataOnline.model.Role;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -27,6 +29,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
 @RequestMapping("/partida")
+@Secured({ Role.Code.USER })
 @Tag(name = "Partida", description = "Endpoints para gestionar las partidas del juego")
 public class PartidaControlador {
 
@@ -120,6 +123,21 @@ public class PartidaControlador {
         } catch (Exception e) {
             log.error("Error al finalizar partida: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
+    }
+
+    @PutMapping("/{id}/reanudar")
+    @Operation(summary = "Reanudar partida", description = "Cambia una partida pausada a estado activa")
+    @ApiResponse(responseCode = "200", description = "Partida reanudada exitosamente")
+    public ResponseEntity<?> reanudarPartida(
+        @Parameter(description = "ID de la partida", example = "1", required = true)
+        @PathVariable Long id) {
+        try {
+            PartidaDTO partida = partidaServicio.reanudarPartida(id);
+            return ResponseEntity.ok(partida);
+        } catch (Exception e) {
+            log.error("Error al reanudar partida: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
     }
 

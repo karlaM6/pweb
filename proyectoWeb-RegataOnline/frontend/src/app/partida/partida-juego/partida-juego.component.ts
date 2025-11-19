@@ -35,6 +35,18 @@ export class PartidaJuegoComponent implements OnInit {
     this.partidaService.obtenerPartida(id).subscribe({
       next: (partida) => {
         this.partida.set(partida);
+        // Si la partida está pausada, reanudar automáticamente
+        if (partida.estado === 'pausada' && partida.id) {
+          this.partidaService.reanudarPartida(partida.id).subscribe({
+            next: (reanudada) => {
+              this.partida.set(reanudada);
+            },
+            error: (err) => {
+              console.error('Error al reanudar partida', err);
+              this.mensaje.set(typeof err.error === 'string' ? err.error : 'No se pudo reanudar la partida');
+            }
+          });
+        }
         
         // Verificar si la partida ya terminó
         if (partida.estado === 'terminada') {
