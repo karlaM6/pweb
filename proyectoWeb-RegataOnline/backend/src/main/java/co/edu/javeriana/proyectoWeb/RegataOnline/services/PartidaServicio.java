@@ -78,9 +78,12 @@ public class PartidaServicio {
         partidaRepositorio.findByBarcoAndEstadoIn(barco, Arrays.asList("activa", "pausada"))
             .ifPresent(p -> { throw new RuntimeException("El barco seleccionado ya está en uso en otra partida."); });
 
-        // Validar que el barco pertenece al jugador
-        if (barco.getJugador() != null && !barco.getJugador().getId().equals(jugador.getId())) {
-            throw new RuntimeException("El barco no pertenece a este jugador");
+        // Si el barco pertenece a otro jugador, reasignarlo al creador de la partida.
+        // (Se permite que el creador escoja cualquier barco y que éste pase a ser suyo.)
+        if (barco.getJugador() == null || !barco.getJugador().getId().equals(jugador.getId())) {
+            log.info("Reasignando barco id={} al jugador id={}", barco.getId(), jugador.getId());
+            barco.setJugador(jugador);
+            barco = barcoRepositorio.save(barco);
         }
 
         // Buscar la celda de partida (tipo 'P') en el mapa

@@ -30,12 +30,12 @@ h1 {
   background: #f8f9fa;
   padding: 1rem;
   border-radius: 8px;
-  border-left: 4px solid #667eea;
+  border-left: 4px solid #0b6ef6;
 }
 
 .info-item strong {
   display: block;
-  color: #667eea;
+  color: #0b6ef6;
   font-size: 0.9rem;
   margin-bottom: 0.5rem;
   text-transform: uppercase;
@@ -57,7 +57,7 @@ h1 {
 .btn-back {
   flex: 1;
   padding: 0.8rem;
-  background: #667eea;
+  background: #0b6ef6;
   color: white;
   border: none;
   border-radius: 8px;
@@ -68,7 +68,7 @@ h1 {
 }
 
 .btn-back:hover {
-  background: #764ba2;
+  background: #0056d6;
   transform: translateY(-2px);
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }

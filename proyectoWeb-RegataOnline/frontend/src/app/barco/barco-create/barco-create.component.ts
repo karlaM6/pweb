@@ -142,7 +142,7 @@ export class BarcoCreateComponent {
     
     switch(celda.tipo) {
       case 'x': return '#2c3e50';
-      case 'P': return '#27ae60';
+      case 'P': return '#ff7a59';
       case 'M': return '#e74c3c';
       default: return '#3498db';
     }

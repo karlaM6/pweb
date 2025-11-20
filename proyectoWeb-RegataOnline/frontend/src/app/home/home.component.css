@@ -3,14 +3,59 @@
   margin: 0 auto;
 }
 
+/* Topbar (small polished header) */
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.6rem 1rem;
+  border-radius: 10px;
+  margin: 1rem 0 2rem 0;
+  background: transparent;
+}
+
+.topbar-left .site-title {
+  font-weight: 800;
+  font-size: 1.25rem;
+  color: #0b6ef6; /* primary brand color */
+}
+
+.auth-controls {
+  display: flex;
+  align-items: center;
+  gap: 1rem; /* more breathing room */
+}
+
+.auth-controls .user-email {
+  font-weight: 600;
+  color: #2c3e50;
+  margin-right: 0.5rem;
+}
+
+/* Make topbar buttons a bit smaller than main CTAs */
+.topbar .btn {
+  padding: 0.5rem 0.9rem;
+  font-size: 0.95rem;
+  border-radius: 8px;
+}
+
+/* Logout: use primary purple gradient like main CTA but slightly smaller */
+.topbar .btn-primary.btn-logout {
+  background: linear-gradient(135deg, #0b6ef6 0%, #0056d6 100%);
+  color: white;
+  padding: 0.45rem 0.85rem;
+  font-weight: 700;
+}
+
+
 /* Hero Section */
 .hero-section {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #0b6ef6 0%, #0056d6 100%);
   padding: 4rem 2rem;
   border-radius: 20px;
   margin-bottom: 3rem;
   color: white;
-  box-shadow: 0 10px 40px rgba(102, 126, 234, 0.3);
+  box-shadow: 0 10px 40px rgba(11, 110, 246, 0.24);
 }
 
 .hero-content {
@@ -65,12 +110,12 @@
 }
 
 .btn-crear {
-  background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+  background: linear-gradient(135deg, #ff7a59 0%, #ffb077 100%);
   color: white;
 }
 
 .btn-crear:hover {
-  background: linear-gradient(135deg, #0d7a70 0%, #2dd863 100%);
+  background: linear-gradient(135deg, #ff6a40 0%, #ff9a50 100%);
 }
 
 .btn-continuar {
@@ -83,12 +128,12 @@
 }
 
 .btn-modelos {
-  background: linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%);
+  background: linear-gradient(135deg, #0b6ef6 0%, #0056d6 100%);
   color: white;
 }
 
 .btn-modelos:hover {
-  background: linear-gradient(135deg, #8e44ad 0%, #732d91 100%);
+  background: linear-gradient(135deg, #0056d6 0%, #0041b0 100%);
 }
 
 .btn-icon {
@@ -186,7 +231,7 @@
   left: 0;
   right: 0;
   height: 4px;
-  background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(90deg, #0b6ef6 0%, #0056d6 100%);
   transform: scaleX(0);
   transition: transform 0.4s ease;
 }
@@ -197,7 +242,7 @@
 
 .feature-card:hover {
   transform: translateY(-12px);
-  box-shadow: 0 12px 40px rgba(102, 126, 234, 0.25);
+  box-shadow: 0 12px 40px rgba(11, 110, 246, 0.25);
 }
 
 .barcos-card:hover {
@@ -269,13 +314,13 @@
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #0b6ef6 0%, #0056d6 100%);
   color: white;
 }
 
 .btn-primary:hover {
   transform: scale(1.05);
-  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+  box-shadow: 0 8px 25px rgba(11, 110, 246, 0.4);
 }
 
 .btn-secondary {
@@ -289,13 +334,13 @@
 }
 
 .btn-accent {
-  background: linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%);
+  background: linear-gradient(135deg, #0b6ef6 0%, #0056d6 100%);
   color: white;
 }
 
 .btn-accent:hover {
   transform: scale(1.05);
-  box-shadow: 0 8px 25px rgba(155, 89, 182, 0.4);
+  box-shadow: 0 8px 25px rgba(11, 110, 246, 0.4);
 }
 
 .btn-arrow {

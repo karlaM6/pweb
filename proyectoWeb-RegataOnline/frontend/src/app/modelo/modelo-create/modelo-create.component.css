@@ -19,7 +19,7 @@ h2 {
   color: #2c3e50;
   font-size: 1.5rem;
   margin-bottom: 1rem;
-  border-bottom: 2px solid #9b59b6;
+  border-bottom: 2px solid #0b6ef6;
   padding-bottom: 0.5rem;
 }
 
@@ -50,7 +50,7 @@ form {
 }
 
 label {
-  color: #9b59b6;
+  color: #0b6ef6;
   font-weight: 600;
   margin-bottom: 0.5rem;
   font-size: 0.9rem;
@@ -67,9 +67,9 @@ input, select {
 
 input:focus, select:focus {
   outline: none;
-  border-color: #9b59b6;
+  border-color: #0b6ef6;
   background: white;
-  box-shadow: 0 0 0 3px rgba(155, 89, 182, 0.1);
+  box-shadow: 0 0 0 3px rgba(11, 110, 246, 0.1);
 }
 
 .color-input-group {
@@ -107,7 +107,7 @@ input:focus, select:focus {
 
 .btn-submit {
   padding: 1rem 2.5rem;
-  background: linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%);
+  background: linear-gradient(135deg, #0b6ef6 0%, #0056d6 100%);
   color: white;
   border: none;
   border-radius: 8px;
@@ -115,12 +115,12 @@ input:focus, select:focus {
   font-size: 1rem;
   cursor: pointer;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 6px rgba(155, 89, 182, 0.3);
+  box-shadow: 0 4px 6px rgba(11, 110, 246, 0.24);
 }
 
 .btn-submit:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 12px rgba(155, 89, 182, 0.4);
+  box-shadow: 0 6px 12px rgba(11, 110, 246, 0.36);
 }
 
 .btn-cancel {

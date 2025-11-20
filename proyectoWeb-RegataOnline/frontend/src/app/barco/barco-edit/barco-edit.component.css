@@ -19,7 +19,7 @@ h2 {
   color: #2c3e50;
   font-size: 1.5rem;
   margin-bottom: 1rem;
-  border-bottom: 2px solid #667eea;
+  border-bottom: 2px solid #0b6ef6;
   padding-bottom: 0.5rem;
 }
 
@@ -50,7 +50,7 @@ form {
 }
 
 label {
-  color: #667eea;
+  color: #0b6ef6;
   font-weight: 600;
   margin-bottom: 0.5rem;
   font-size: 0.9rem;
@@ -67,9 +67,9 @@ input, select {
 
 input:focus, select:focus {
   outline: none;
-  border-color: #667eea;
+  border-color: #0b6ef6;
   background: white;
-  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+  box-shadow: 0 0 0 3px rgba(11, 110, 246, 0.1);
 }
 
 select {
@@ -85,7 +85,7 @@ select {
   padding: 1rem;
   border-radius: 8px;
   margin-bottom: 1rem;
-  border-left: 4px solid #667eea;
+  border-left: 4px solid #0b6ef6;
 }
 
 .mapa-instrucciones p {
@@ -98,7 +98,7 @@ select {
   padding: 0.75rem;
   border-radius: 4px;
   margin-top: 0.5rem;
-  color: #667eea;
+  color: #0b6ef6;
   font-weight: 600;
 }
 
@@ -135,7 +135,7 @@ select {
 .celda:hover:not(.no-navegable) {
   transform: scale(1.2);
   z-index: 10;
-  box-shadow: 0 0 15px rgba(102, 126, 234, 0.6);
+  box-shadow: 0 0 15px rgba(11, 110, 246, 0.6);
 }
 
 .celda.no-navegable {
@@ -195,7 +195,7 @@ select {
 }
 
 .color-box.partida {
-  background-color: #27ae60;
+  background-color: #ff7a59;
 }
 
 .color-box.meta {
@@ -229,12 +229,12 @@ select {
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #0b6ef6 0%, #0056d6 100%);
   color: white;
 }
 
 .btn-primary:hover {
-  background: linear-gradient(135deg, #5568d3 0%, #6a3f8f 100%);
+  background: linear-gradient(135deg, #0056d6 0%, #0041b0 100%);
 }
 
 .btn-cancel {

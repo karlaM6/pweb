@@ -1,5 +1,73 @@
+label {
+  color: #27ae60;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  font-size: 0.9rem;
+}
+input, select {
+  padding: 0.8rem;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 1rem;
+label {
+  color: #ff7a59;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  font-size: 0.9rem;
+}
+  transition: all 0.3s ease;
+  background: #f8f9fa;
+}
+.mapa-instrucciones {
+  background: #e8f5e9;
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  border-left: 4px solid #27ae60;
+}
+.celda:hover:not(.no-navegable) {
+  transform: scale(1.2);
+  z-index: 10;
+  box-shadow: 0 0 15px rgba(39, 174, 96, 0.6);
+}
+.celda-info {
+input:focus, select:focus {
+  outline: none;
+  border-color: #ff7a59;
+  background: white;
+  box-shadow: 0 0 0 3px rgba(255, 122, 89, 0.12);
+}
+  background: white;
+  padding: 0.75rem;
+  border-radius: 4px;
+  margin-top: 0.5rem;
+  color: #27ae60;
+  font-weight: 600;
+}
+.color-box.partida {
+  background-color: #27ae60;
+}
+.btn-primary {
+  background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
+  color: white;
+.mapa-instrucciones {
+  background: #fff6f2;
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  border-left: 4px solid #ff7a59;
+}
+}
+.btn-primary:hover {
+  background: linear-gradient(135deg, #229954 0%, #27ae60 100%);
+}
 .container {
   max-width: 1200px;
+.celda:hover:not(.no-navegable) {
+  transform: scale(1.2);
+  z-index: 10;
+  box-shadow: 0 0 15px rgba(255, 122, 89, 0.6);
+}
   margin: 0 auto;
   padding: 2rem;
 }
@@ -9,18 +77,36 @@ h1 {
   font-size: 2rem;
   margin-bottom: 2rem;
   text-align: center;
+.celda-info {
+  background: white;
+  padding: 0.75rem;
+  border-radius: 4px;
+  margin-top: 0.5rem;
+  color: #ff7a59;
+  font-weight: 600;
+}
   padding: 1rem;
   background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
   border-radius: 8px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+.color-box.partida {
+  background-color: #ff7a59;
+}
 }
 
 h2 {
   color: #2c3e50;
   font-size: 1.5rem;
+.btn-primary {
+  background: linear-gradient(135deg, #ff7a59 0%, #ffb077 100%);
+  color: white;
+}
   margin-bottom: 1rem;
   border-bottom: 2px solid #27ae60;
   padding-bottom: 0.5rem;
+}
+.btn-primary:hover {
+  background: linear-gradient(135deg, #ff6a40 0%, #ff9a50 100%);
 }
 
 form {

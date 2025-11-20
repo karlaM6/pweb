@@ -166,7 +166,7 @@ export class BarcoEditComponent {
     
     switch(celda.tipo) {
       case 'x': return '#2c3e50'; // Pared
-      case 'P': return '#27ae60'; // Partida
+      case 'P': return '#ff7a59'; // Partida (orange)
       case 'M': return '#e74c3c'; // Meta
       default: return '#3498db';  // Agua
     }

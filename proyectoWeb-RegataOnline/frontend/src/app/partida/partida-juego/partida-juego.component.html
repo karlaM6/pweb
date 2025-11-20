@@ -69,16 +69,17 @@
                 }
               </ul>
               <button class="btn btn-sm" (click)="cargarEstado(partida()?.id!)">🔄 Refrescar estado</button>
-              @if (!participa()) {
-                <div class="join-panel">
-                  <label for="barcoJoin">Selecciona tu barco:</label>
-                  <select id="barcoJoin" [value]="barcoParaUnirId()" (change)="onBarcoInput($event)">
-                    <option *ngFor="let b of barcosDisponibles()" [value]="b.id">#{{ b.id }} {{ b.nombre }}</option>
-                  </select>
-                  <button class="btn btn-primary btn-sm" (click)="joinPartida()" [disabled]="barcosDisponibles().length === 0">➕ Unirme</button>
-                  <small *ngIf="barcosDisponibles().length === 0">No tienes barcos disponibles.</small>
-                </div>
-              }
+              <!-- Mostrar siempre el panel de unión para mayor claridad; el botón quedará deshabilitado si ya participas o no tienes barcos -->
+              <div class="join-panel">
+                <label for="barcoJoin">Selecciona tu barco:</label>
+                <select id="barcoJoin" [value]="barcoParaUnirId()" (change)="onBarcoInput($event)">
+                  <option *ngFor="let b of barcosDisponibles()" [value]="b.id">#{{ b.id }} {{ b.nombre }}</option>
+                </select>
+                <button class="btn btn-primary btn-sm" (click)="joinPartida()" [disabled]="barcosDisponibles().length === 0 || participa()">➕ Unirme</button>
+                <small *ngIf="barcosDisponibles().length === 0">No tienes barcos disponibles.</small>
+                <small *ngIf="participa()" style="display:block;color:#2d9a4a;margin-top:0.4rem;font-weight:600;">✔️ Ya estás en la partida</small>
+              </div>
+              <!-- Debug UI removed -->
             </div>
           }
         </div>

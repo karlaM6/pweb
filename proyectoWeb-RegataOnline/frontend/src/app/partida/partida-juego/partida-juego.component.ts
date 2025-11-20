@@ -42,10 +42,12 @@ export class PartidaJuegoComponent implements OnInit, OnDestroy {
     const uid = this.authService.userId();
     if (uid != null && !isNaN(uid)) {
       this.jugadorId.set(uid);
+      console.log('[DEBUG] jugadorId detectado en ngOnInit ->', uid);
       // Cargar barcos del jugador para selección segura
       this.partidaService.listarBarcosJugador(uid).subscribe({
         next: barcos => {
           this.barcosDisponibles.set(barcos);
+          console.log('[DEBUG] barcosDisponibles cargados ->', barcos);
           if (barcos.length > 0) this.barcoParaUnirId.set(barcos[0].id);
         },
         error: err => console.warn('No se pudieron cargar barcos del jugador', err)
@@ -295,7 +297,7 @@ export class PartidaJuegoComponent implements OnInit, OnDestroy {
     // Tipos de celda
     switch(celda.tipo) {
       case 'x': return '#2c3e50'; // Pared
-      case 'P': return '#27ae60'; // Partida
+      case 'P': return '#ff7a59'; // Partida (orange)
       case 'M': return '#f39c12'; // Meta
       default: return '#ecf0f1'; // Agua
     }
@@ -426,6 +428,8 @@ export class PartidaJuegoComponent implements OnInit, OnDestroy {
       next: estado => {
         this.estadoMultijugador.set(estado);
         this.participantes.set(estado.participantes);
+        console.log('[DEBUG] estado recibido -> participantes:', estado.participantes);
+        console.log('[DEBUG] jugadorId actual ->', this.jugadorId());
         if (!this.barcoSeleccionadoId()) {
           const propio = estado.participantes.find(p => p.jugadorId === this.jugadorId());
           if (propio) this.barcoSeleccionadoId.set(propio.barcoId);

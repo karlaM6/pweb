@@ -10,7 +10,7 @@ h1 {
   margin-bottom: 2rem;
   text-align: center;
   padding: 1.5rem;
-  background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
+  background: linear-gradient(135deg, #ff7a00 0%, #ffb347 100%);
   border-radius: 12px;
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
 }
@@ -31,7 +31,7 @@ h1 {
 }
 
 .jugador-info strong {
-  color: #27ae60;
+  color: #ff7a00;
   display: block;
   font-size: 0.9rem;
 }
@@ -83,13 +83,13 @@ h2 {
 .card-mapa:hover, .card-barco:hover {
   transform: translateY(-5px);
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
-  border-color: #27ae60;
+  border-color: #ff7a00;
 }
 
 .card-mapa.seleccionado, .card-barco.seleccionado {
-  border-color: #27ae60;
-  background: #e8f5e9;
-  box-shadow: 0 8px 16px rgba(39, 174, 96, 0.3);
+  border-color: #ff7a00;
+  background: #fff4e6;
+  box-shadow: 0 8px 16px rgba(255, 122, 0, 0.18);
 }
 
 .card-header {
@@ -97,7 +97,7 @@ h2 {
 }
 
 .badge-mapa {
-  background: #27ae60;
+  background: #ff7a00;
   color: white;
   padding: 0.5rem 1rem;
   border-radius: 20px;
@@ -118,7 +118,7 @@ h2 {
 .dimensiones {
   font-size: 2rem;
   font-weight: 700;
-  color: #27ae60;
+  color: #ff7a00;
   margin-bottom: 0.5rem;
 }
 
@@ -146,7 +146,7 @@ h2 {
 
 .stat .value {
   display: block;
-  color: #27ae60;
+  color: #ff7a00;
   font-size: 1.5rem;
   font-weight: 700;
 }
@@ -157,7 +157,7 @@ h2 {
   right: 10px;
   width: 40px;
   height: 40px;
-  background: #27ae60;
+  background: #ff7a00;
   color: white;
   border-radius: 50%;
   display: flex;
@@ -181,7 +181,7 @@ h2 {
 }
 
 .link-crear {
-  color: #27ae60;
+  color: #ff7a00;
   text-decoration: none;
   font-weight: 600;
   font-size: 1rem;
@@ -219,7 +219,7 @@ h2 {
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
+  background: linear-gradient(135deg, #ff7a00 0%, #ffb347 100%);
   color: white;
 }
 

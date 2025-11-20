@@ -9,12 +9,12 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #0b6ef6 0%, #0056d6 100%);
   padding: 1.5rem 2rem;
   border-radius: 15px;
   color: white;
   margin-bottom: 2rem;
-  box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+  box-shadow: 0 8px 20px rgba(11, 110, 246, 0.24);
 }
 
 .header-left h1 {
@@ -47,7 +47,7 @@
   width: 50px;
   height: 50px;
   border: 5px solid #f3f3f3;
-  border-top: 5px solid #667eea;
+  border-top: 5px solid #0b6ef6;
   border-radius: 50%;
   animation: spin 1s linear infinite;
 }
@@ -70,7 +70,7 @@
 }
 
 .mensaje-alert.success {
-  background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+  background: linear-gradient(135deg, #ff7a59 0%, #ffb077 100%);
 }
 
 @keyframes slideDown {
@@ -147,11 +147,11 @@
 
 .stat-value.velocity {
   font-family: 'Courier New', monospace;
-  color: #667eea;
+  color: #0b6ef6;
 }
 
 .estado-activa {
-  color: #27ae60;
+  color: #ff7a59;
 }
 
 .estado-pausada {
@@ -351,7 +351,7 @@
   background: linear-gradient(135deg, rgba(52, 152, 219, 0.3) 0%, rgba(46, 204, 113, 0.3) 100%) !important;
   transform: scale(1.15);
   box-shadow: 0 0 25px rgba(52, 152, 219, 0.8);
-  border-color: #2ecc71;
+  border-color: #ff9f6b;
   z-index: 5;
 }
 
@@ -394,7 +394,7 @@
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+  background: linear-gradient(135deg, #0b6ef6 0%, #0056d6 100%);
   color: white;
 }
 

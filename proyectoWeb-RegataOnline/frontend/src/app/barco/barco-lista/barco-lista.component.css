@@ -4,7 +4,7 @@ h1 {
   margin-bottom: 1.5rem;
   text-align: center;
   padding: 1rem;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #0b6ef6 0%, #0056d6 100%);
   color: white;
   border-radius: 8px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
@@ -21,18 +21,18 @@ h1 {
 
 .btn-create {
   padding: 0.8rem 1.5rem;
-  background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
+  background: linear-gradient(135deg, #ff7a59 0%, #ffb077 100%);
   color: white;
   text-decoration: none;
   border-radius: 8px;
   font-weight: 600;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 6px rgba(39, 174, 96, 0.2);
+  box-shadow: 0 4px 6px rgba(255, 122, 89, 0.18);
 }
 
 .btn-create:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 12px rgba(39, 174, 96, 0.3);
+  box-shadow: 0 6px 12px rgba(255, 122, 89, 0.26);
 }
 
 ul {
