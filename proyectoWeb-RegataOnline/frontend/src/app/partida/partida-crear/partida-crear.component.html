@@ -1,9 +1,9 @@
 <div class="container">
-  <h1>✨ Crear Nueva Partida</h1>
+  <h1>Crear Nueva Partida</h1>
 
   <ng-container *ngIf="jugador() as j; else sinJugador">
     <div class="jugador-info">
-      <span class="icono">👤</span>
+      <span class="icono"></span>
       <div>
         <strong>Jugador:</strong>
         <p>{{ j.nombre }}</p>
@@ -13,7 +13,7 @@
     <form class="form-partida">
       <!-- Selección de Mapa -->
       <div class="form-section">
-        <h2>🗺️ Selecciona un Mapa</h2>
+  <h2>Selecciona un Mapa</h2>
         <div class="grid-mapas">
           <ng-container *ngIf="mapas().length > 0; else noMapas">
             <div *ngFor="let mapa of mapas()" class="card-mapa"
@@ -40,7 +40,7 @@
 
       <!-- Selección de Barco -->
       <div class="form-section">
-        <h2>🚢 Selecciona tu Barco</h2>
+        <h2>Selecciona tu Barco</h2>
         <div class="grid-barcos">
           <ng-container *ngIf="barcos().length > 0; else noBarcos">
             <div *ngFor="let barco of barcos()" class="card-barco"
@@ -80,7 +80,7 @@
           class="btn btn-primary"
           (click)="crearPartida()"
           [disabled]="!mapaSeleccionado() || !barcoSeleccionado()">
-          🚀 Crear Partida
+          Crear Partida
         </button>
         <button type="button" class="btn btn-secondary" (click)="cancelar()">
           ← Volver

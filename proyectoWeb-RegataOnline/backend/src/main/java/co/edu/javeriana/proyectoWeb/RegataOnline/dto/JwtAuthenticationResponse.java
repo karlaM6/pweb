@@ -6,6 +6,7 @@ public class JwtAuthenticationResponse {
     private String token;
     private String email;
     private Role role;
+    private Long jugadorId; // Nuevo campo para exponer ID numérico en frontend
 
     public JwtAuthenticationResponse() {
     }
@@ -14,6 +15,13 @@ public class JwtAuthenticationResponse {
         this.token = token;
         this.email = email;
         this.role = role;
+    }
+
+    public JwtAuthenticationResponse(String token, String email, Role role, Long jugadorId) {
+        this.token = token;
+        this.email = email;
+        this.role = role;
+        this.jugadorId = jugadorId;
     }
 
     public String getToken() {
@@ -38,5 +46,13 @@ public class JwtAuthenticationResponse {
 
     public void setRole(Role role) {
         this.role = role;
+    }
+
+    public Long getJugadorId() {
+        return jugadorId;
+    }
+
+    public void setJugadorId(Long jugadorId) {
+        this.jugadorId = jugadorId;
     }
 }

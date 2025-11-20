@@ -23,6 +23,26 @@ export interface Partida {
   haLlegadoMeta?: boolean;
 }
 
+// Estado multijugador
+export interface GameStateParticipant {
+  jugadorId: number;
+  jugadorEmail: string;
+  barcoId: number;
+  barcoNombre: string;
+  posicionX: number;
+  posicionY: number;
+  velocidadX: number;
+  velocidadY: number;
+  estado: string;
+}
+
+export interface GameState {
+  partidaId: number;
+  estadoPartida: string;
+  haLlegadoMeta: boolean;
+  participantes: GameStateParticipant[];
+}
+
 export interface CrearPartidaRequest {
   jugadorId: number;
   mapaId: number;
@@ -40,6 +60,7 @@ export interface MoverBarcoRequest {
 export class PartidaService {
   http = inject(HttpClient);
   url = environment.baseUrl + '/partida';
+  barcosJugadorBaseUrl = environment.baseUrl + '/jugador/barcos';
 
   crearPartida(request: CrearPartidaRequest): Observable<Partida> {
     return this.http.post<Partida>(`${this.url}/crear`, request);
@@ -75,4 +96,30 @@ export class PartidaService {
       {}
     );
   }
+
+  moverBarcoMultijugador(partidaId: number, barcoId: number, aceleracionX: number, aceleracionY: number): Observable<Partida> {
+    return this.http.put<Partida>(
+      `${this.url}/${partidaId}/mover?barcoId=${barcoId}&aceleracionX=${aceleracionX}&aceleracionY=${aceleracionY}`,
+      {}
+    );
+  }
+
+  unirAPartida(partidaId: number, jugadorId: number, barcoId: number): Observable<GameState> {
+    return this.http.post<GameState>(`${this.url}/${partidaId}/join?jugadorId=${jugadorId}&barcoId=${barcoId}`, {});
+  }
+
+  estadoPartida(partidaId: number): Observable<GameState> {
+    return this.http.get<GameState>(`${this.url}/${partidaId}/estado`);
+  }
+
+  listarBarcosJugador(jugadorId: number): Observable<BarcoResumen[]> {
+    return this.http.get<BarcoResumen[]>(`${this.barcosJugadorBaseUrl}/${jugadorId}/list`);
+  }
+}
+
+export interface BarcoResumen {
+  id: number;
+  nombre: string;
+  posicionX?: number;
+  posicionY?: number;
 }

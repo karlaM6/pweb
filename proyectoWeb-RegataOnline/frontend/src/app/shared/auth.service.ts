@@ -47,6 +47,24 @@ export class AuthService {
     return sessionStorage.getItem(EMAIL);
   }
 
+  userId(): number | null {
+    const token = this.token();
+    if (!token) return null;
+    try {
+      const payloadPart = token.split('.')[1];
+      if (!payloadPart) return null;
+      const json = JSON.parse(atob(payloadPart));
+      // Prefer jugadorId claim embedded in JWT; fall back to numeric id/userId
+      const raw = json.jugadorId ?? json.id ?? json.userId;
+      if (raw == null) return null;
+      if (typeof raw === 'number') return raw;
+      const numeric = Number(raw);
+      return isNaN(numeric) ? null : numeric;
+    } catch (e) {
+      return null;
+    }
+  }
+
   // Return true when the stored role indicates admin privileges.
   // We handle both plain strings like 'ADMIN' and any object/string that contains 'ADMIN'.
   isAdmin(): boolean {

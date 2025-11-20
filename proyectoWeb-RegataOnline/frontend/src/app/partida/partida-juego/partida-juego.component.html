@@ -57,6 +57,30 @@
               {{ partida()?.estado }}
             </span>
           </div>
+          @if (multijugador()) {
+            <div class="multiplayer-section">
+              <h4>👥 Participantes</h4>
+              <ul class="participantes-list">
+                @for (p of participantes(); track p.barcoId) {
+                  <li [class.propietario]="p.jugadorId === jugadorId()" [class.seleccionado]="p.barcoId === barcoSeleccionadoId()" (click)="barcoSeleccionadoId.set(p.barcoId)">
+                    <span>#{{ p.barcoId }} - {{ p.jugadorEmail }}</span>
+                    <small>Pos: ({{ p.posicionX }}, {{ p.posicionY }}) v=({{ p.velocidadX }},{{ p.velocidadY }})</small>
+                  </li>
+                }
+              </ul>
+              <button class="btn btn-sm" (click)="cargarEstado(partida()?.id!)">🔄 Refrescar estado</button>
+              @if (!participa()) {
+                <div class="join-panel">
+                  <label for="barcoJoin">Selecciona tu barco:</label>
+                  <select id="barcoJoin" [value]="barcoParaUnirId()" (change)="onBarcoInput($event)">
+                    <option *ngFor="let b of barcosDisponibles()" [value]="b.id">#{{ b.id }} {{ b.nombre }}</option>
+                  </select>
+                  <button class="btn btn-primary btn-sm" (click)="joinPartida()" [disabled]="barcosDisponibles().length === 0">➕ Unirme</button>
+                  <small *ngIf="barcosDisponibles().length === 0">No tienes barcos disponibles.</small>
+                </div>
+              }
+            </div>
+          }
         </div>
 
         <!-- Instrucciones -->

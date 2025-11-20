@@ -3,6 +3,7 @@ package co.edu.javeriana.proyectoWeb.RegataOnline.services;
 import java.time.Duration;
 import java.util.Date;
 import java.util.function.Function;
+import co.edu.javeriana.proyectoWeb.RegataOnline.model.Jugador;
 
 import javax.crypto.SecretKey;
 
@@ -26,8 +27,18 @@ public class JwtService {
         return extractClaim(token, Claims::getSubject);
     }
 
-    public String generateToken(String username) {
+    public String generateToken(String username, Long jugadorId) {
         return Jwts.builder().subject(username)
+                .claim("jugadorId", jugadorId)
+                .issuedAt(new Date(System.currentTimeMillis()))
+                .expiration(new Date(System.currentTimeMillis() + tokeDuration.toMillis()))
+                .signWith(getSigningKey()).compact();
+    }
+
+    // Nuevo método que incluye el claim jugadorId para facilitar obtención del ID numérico en el frontend
+    public String generateToken(Jugador jugador) {
+        return Jwts.builder().subject(jugador.getUsername())
+                .claim("jugadorId", jugador.getId())
                 .issuedAt(new Date(System.currentTimeMillis()))
                 .expiration(new Date(System.currentTimeMillis() + tokeDuration.toMillis()))
                 .signWith(getSigningKey()).compact();

@@ -2,32 +2,26 @@
   <header class="app-header">
     <div class="header-content">
       <a routerLink="/" class="logo">
-        <span class="logo-icon">⛵</span>
+        <span class="logo-icon">RO</span>
         <span class="logo-text">Regata Online</span>
       </a>
       <nav class="main-nav">
         <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
-          <span class="nav-icon">🏠</span>
           Inicio
         </a>
-        <a routerLink="/partida/menu" routerLinkActive="active">
-          <span class="nav-icon">🎮</span>
+        <a routerLink="/partida/menu" routerLinkActive="active" *ngIf="!auth.isAdmin()">
           Jugar
         </a>
-        <a routerLink="/barco/list" routerLinkActive="active">
-          <span class="nav-icon">🚢</span>
+        <a routerLink="/barco/list" routerLinkActive="active" *ngIf="auth.isAdmin()">
           Barcos
         </a>
-        <a routerLink="/jugador/list" routerLinkActive="active">
-          <span class="nav-icon">👥</span>
+        <a routerLink="/jugador/list" routerLinkActive="active" *ngIf="auth.isAdmin()">
           Jugadores
         </a>
-        <a routerLink="/modelo/list" routerLinkActive="active">
-          <span class="nav-icon">🎨</span>
+        <a routerLink="/modelo/list" routerLinkActive="active" *ngIf="auth.isAdmin()">
           Modelos
         </a>
-        <a routerLink="/mapa/list" routerLinkActive="active">
-          <span class="nav-icon">🗺️</span>
+        <a routerLink="/mapa/list" routerLinkActive="active" *ngIf="auth.isAdmin()">
           Mapas
         </a>
       </nav>

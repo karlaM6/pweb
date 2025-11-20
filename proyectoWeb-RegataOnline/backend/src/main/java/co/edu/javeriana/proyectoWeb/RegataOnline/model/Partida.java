@@ -1,6 +1,8 @@
 package co.edu.javeriana.proyectoWeb.RegataOnline.model;
 
 import java.time.LocalDateTime;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -9,6 +11,8 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 
@@ -19,6 +23,9 @@ public class Partida {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     
+    // Campo legado para la primera implementación (modo single player).
+    // En modo multijugador se usa la colección participantes y este campo
+    // corresponde al jugador creador/host de la partida.
     @ManyToOne
     @JoinColumn(name = "jugador_id", nullable = false)
     private Jugador jugador;
@@ -27,9 +34,14 @@ public class Partida {
     @JoinColumn(name = "mapa_id", nullable = false)
     private Mapa mapa;
     
+    // Barco legado (single player). En multijugador cada participante tiene su propio barco.
     @ManyToOne
     @JoinColumn(name = "barco_id", nullable = false)
     private Barco barco;
+
+    // Participantes multijugador (jugador + barco asignado). Cascade para persistir.
+    @OneToMany(mappedBy = "partida", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<PartidaParticipante> participantes = new LinkedHashSet<>();
     
     @Column(nullable = false)
     private String estado; // "activa", "pausada", "terminada"
@@ -101,6 +113,19 @@ public class Partida {
 
     public void setBarco(Barco barco) {
         this.barco = barco;
+    }
+
+    public Set<PartidaParticipante> getParticipantes() {
+        return participantes;
+    }
+
+    public void setParticipantes(Set<PartidaParticipante> participantes) {
+        this.participantes = participantes;
+    }
+
+    public void agregarParticipante(PartidaParticipante p) {
+        this.participantes.add(p);
+        p.setPartida(this);
     }
 
     public String getEstado() {

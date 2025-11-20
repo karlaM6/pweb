@@ -20,6 +20,7 @@ import org.springframework.security.access.annotation.Secured;
 import co.edu.javeriana.proyectoWeb.RegataOnline.dto.CrearPartidaRequest;
 import co.edu.javeriana.proyectoWeb.RegataOnline.dto.PartidaDTO;
 import co.edu.javeriana.proyectoWeb.RegataOnline.services.PartidaServicio;
+import co.edu.javeriana.proyectoWeb.RegataOnline.dto.GameStateDTO;
 import co.edu.javeriana.proyectoWeb.RegataOnline.model.Role;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -147,16 +148,64 @@ public class PartidaControlador {
     public ResponseEntity<?> moverBarco(
         @Parameter(description = "ID de la partida", example = "1", required = true)
         @PathVariable Long id,
+        @Parameter(description = "ID del barco a mover (omitido para modo single player)")
+        @RequestParam(required = false) Long barcoId,
         @Parameter(description = "Aceleración en X (-1, 0, o +1)", required = true)
         @RequestParam Integer aceleracionX,
         @Parameter(description = "Aceleración en Y (-1, 0, o +1)", required = true)
         @RequestParam Integer aceleracionY) {
         try {
-            PartidaDTO partida = partidaServicio.moverBarco(id, aceleracionX, aceleracionY);
+            PartidaDTO partida = partidaServicio.moverBarco(id, aceleracionX, aceleracionY, barcoId);
             return ResponseEntity.ok(partida);
         } catch (Exception e) {
             log.error("Error al mover barco: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
+    }
+
+    @PostMapping("/{id}/join")
+    @Operation(summary = "Unirse a partida", description = "Jugador con su barco se une a una partida activa")
+    @ApiResponse(responseCode = "200", description = "Jugador unido exitosamente")
+    public ResponseEntity<?> unirAPartida(
+        @Parameter(description = "ID de la partida", required = true) @PathVariable Long id,
+        @Parameter(description = "ID del jugador", required = true) @RequestParam Long jugadorId,
+        @Parameter(description = "ID del barco", required = true) @RequestParam Long barcoId) {
+        try {
+            GameStateDTO state = partidaServicio.unirAPartida(id, jugadorId, barcoId);
+            return ResponseEntity.ok(state);
+        } catch (Exception e) {
+            String msg = e.getMessage();
+            if (msg != null && msg.contains("El barco no pertenece")) {
+                log.warn("Join rechazado - barco no pertenece al jugador: {}", msg);
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new co.edu.javeriana.proyectoWeb.RegataOnline.dto.ErrorDTO("BARCO_INVALIDO: " + msg));
+            }
+            if (msg != null && msg.contains("ya está en uso")) {
+                log.warn("Join rechazado - barco en uso: {}", msg);
+                return ResponseEntity.status(HttpStatus.CONFLICT).body(new co.edu.javeriana.proyectoWeb.RegataOnline.dto.ErrorDTO("BARCO_EN_USO: " + msg));
+            }
+            log.error("Error al unir jugador a partida: {}", msg);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new co.edu.javeriana.proyectoWeb.RegataOnline.dto.ErrorDTO(msg != null ? msg : "Error desconocido al unirse"));
+        }
+    }
+
+    @GetMapping("/{id}/estado")
+    @Operation(summary = "Estado de partida", description = "Obtiene snapshot con todos los participantes y sus barcos")
+    @ApiResponse(responseCode = "200", description = "Estado obtenido")
+    public ResponseEntity<?> estadoPartida(@PathVariable Long id) {
+        try {
+            GameStateDTO state = partidaServicio.obtenerEstadoPartida(id);
+            return ResponseEntity.ok(state);
+        } catch (Exception e) {
+            String msg = e.getMessage();
+            // Diferenciar logging según sea un 404 esperado (polling antes de crear/join) u otro conflicto real
+            if (msg != null && msg.toLowerCase().contains("no encontrada")) {
+                // Ruido esperado por el cliente cuando aún no existe la partida: bajar nivel a DEBUG
+                log.debug("Partida no encontrada (esperado durante polling): {}", msg);
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(msg);
+            } else {
+                log.error("Error al obtener estado de partida (conflicto): {}", msg);
+                return ResponseEntity.status(HttpStatus.CONFLICT).body(msg);
+            }
         }
     }
 }

@@ -1,1 +1,85 @@
 /* You can add global styles to this file, and also import other style files */
+:root{
+	--bg: #fbfcfe; /* very light */
+	--surface: #ffffff;
+	--muted: #69707a;
+	--text: #0f1720;
+	--primary: #0b6ef6; /* blue */
+	--accent: #ff7a59; /* warm accent */
+	--success: #16a34a;
+	--danger: #ef4444;
+	--card-shadow: 0 6px 18px rgba(15,23,32,0.06);
+}
+
+*{box-sizing:border-box}
+html,body{
+	height:100%;
+	margin:0;
+	background:var(--bg);
+	color:var(--text);
+	font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+	-webkit-font-smoothing:antialiased;
+	-moz-osx-font-smoothing:grayscale;
+}
+
+a{color:inherit;text-decoration:none}
+
+.app-wrapper{display:flex;flex-direction:column;min-height:100vh}
+.app-header{background:linear-gradient(90deg, rgba(11,110,246,0.06), rgba(255,122,89,0.03));border-bottom:1px solid #e6eefc}
+.header-content{max-width:1100px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;padding:12px 20px}
+.logo{display:flex;align-items:center;gap:12px}
+.logo-icon{display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:8px;background:var(--surface);box-shadow:var(--card-shadow);font-weight:700;color:var(--primary)}
+.logo-text{font-weight:600;font-size:1.05rem}
+
+.main-nav a{margin-left:14px;padding:8px 10px;border-radius:8px;color:var(--muted);font-size:0.95rem}
+.main-nav a.active{background:var(--surface);box-shadow:var(--card-shadow);color:var(--text)}
+
+.app-main{flex:1;max-width:1100px;margin:20px auto;padding:0 20px}
+.app-footer{background:transparent;border-top:1px solid #f1f5f9}
+.footer-content{max-width:1100px;margin:0 auto;padding:12px 20px;color:var(--muted);font-size:0.9rem}
+
+/* Buttons */
+.btn{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border-radius:8px;border:0;cursor:pointer}
+.btn-primary{background:var(--primary);color:#fff}
+.btn-secondary{background:#f3f6fb;color:var(--text);border:1px solid #e6eefc}
+.btn-accent{background:var(--accent);color:#fff}
+.btn-outline{background:transparent;border:1px solid #dbeafe;color:var(--primary)}
+.btn-small{padding:6px 8px;font-size:0.85rem}
+.btn-large{padding:12px 18px;font-size:1rem}
+
+/* Cards & grids */
+.cards-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:18px}
+.feature-card{background:var(--surface);box-shadow:var(--card-shadow);border-radius:12px;padding:14px}
+.card-header{display:flex;align-items:center;gap:12px}
+.card-icon{width:40px;height:40px;border-radius:8px;background:#f8fafc;display:inline-flex;align-items:center;justify-content:center;color:var(--primary);font-weight:600}
+
+/* Hero */
+.hero-section{background:linear-gradient(180deg,transparent,rgba(11,110,246,0.02));padding:28px;border-radius:12px}
+.hero-title{font-size:2rem;margin:6px 0}
+.hero-subtitle{color:var(--muted)}
+
+/* Home features */
+.features-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px}
+.feature-item{background:transparent;padding:10px;border-radius:8px}
+.feature-icon{display:inline-block;width:36px;height:36px;border-radius:8px;background:#f1f5f9;color:var(--primary);margin-bottom:8px}
+
+/* Map & game layout tweaks */
+.mapa-container{overflow:auto}
+.mapa-grid{display:flex;flex-direction:column;gap:4px}
+.fila{display:flex;gap:4px}
+.celda{width:34px;height:34px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:0.85rem}
+.celda .celda-icon{font-weight:700}
+.celda.destino-posible{outline:2px solid rgba(11,110,246,0.12)}
+.celda.destino-invalido{opacity:0.6}
+
+/* Misc */
+.mensaje-alert{padding:10px;border-radius:8px;background:#eef9f2;border:1px solid #d1f0de;color:var(--text);margin:10px 0}
+
+/* Responsive */
+@media (max-width:800px){.header-content{padding:10px}.hero-title{font-size:1.5rem}}
+
+/* Small helpers to hide leftover emoji markup if any */
+.emoji-hidden{font-size:0;line-height:0}
+
+/* You can add global styles to this file, and also import other style files */
+/* You can add global styles to this file, and also import other style files */

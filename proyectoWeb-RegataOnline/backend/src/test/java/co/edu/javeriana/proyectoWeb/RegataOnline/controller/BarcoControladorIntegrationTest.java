@@ -75,7 +75,7 @@ public class BarcoControladorIntegrationTest {
         barcoRepo.deleteAll();
         modeloRepo.deleteAll();
 
-        // clear and create test users (one ADMIN and one USER)
+    
         jugadorRepo.deleteAll();
         Jugador admin = new Jugador();
         admin.setNombre("Admin");

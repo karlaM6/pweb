@@ -68,7 +68,7 @@ public class JugadorControladorIntegrationTest {
         barcoRepo.deleteAll();
         jugadorRepo.deleteAll();
 
-        // create test users
+        // usuarios de test
         Jugador admin = new Jugador();
         admin.setNombre("Admin");
         admin.setEmail("admin@local");

@@ -13,10 +13,7 @@ import co.edu.javeriana.proyectoWeb.RegataOnline.repository.BarcoRepositorio;
 import co.edu.javeriana.proyectoWeb.RegataOnline.repository.ModeloRepositorio;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-/**
- * Simple data initializer for development. Creates an ADMIN and a USER if they do not exist.
- * This runs in all profiles (including default). Remove or protect in production.
- */
+
 @Component
 public class DataInitializer implements CommandLineRunner {
 
@@ -34,7 +31,7 @@ public class DataInitializer implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        // create admin if not present
+        
         String adminEmail = "admin@local";
         Jugador admin = jugadorRepositorio.findByEmail(adminEmail).orElse(null);
         if (admin == null) {
@@ -60,19 +57,33 @@ public class DataInitializer implements CommandLineRunner {
             System.out.println("Created default user: " + userEmail + "/user123");
         }
         ensureDefaultBarco(user);
+
+        // Segundo usuario para pruebas de multijugador/polling
+        String user2Email = "user2@local";
+        Jugador user2 = jugadorRepositorio.findByEmail(user2Email).orElse(null);
+        if (user2 == null) {
+            user2 = new Jugador();
+            user2.setNombre("User2");
+            user2.setEmail(user2Email);
+            user2.setPassword(passwordEncoder.encode("user2123"));
+            user2.setRole(Role.USER);
+            user2 = jugadorRepositorio.save(user2);
+            System.out.println("Created second test user: " + user2Email + "/user2123");
+        }
+        ensureDefaultBarco(user2);
     }
 
     /**
-     * Crea un barco inicial para el jugador si no tiene ninguno.
-     * Evita bloquear el flujo de creación de partidas para usuarios nuevos.
+     * Crea un barco inicial para el jugador si no tiene ninguno
+     * Evita bloquear el flujo de creación de partidas para usuarios nuevos
      */
     private void ensureDefaultBarco(Jugador jugador) {
         if (jugador == null) return;
-        // La colección puede venir null si nunca se inicializó.
+        
         if (jugador.getBarcos() != null && !jugador.getBarcos().isEmpty()) {
-            return; // Ya tiene barcos
+            return; 
         }
-        // Buscar / crear modelo por defecto
+        
         Modelo defaultModel = modeloRepositorio.findByNombreModelo("Default").orElseGet(() -> {
             Modelo m = new Modelo("Default", "Azul");
             return modeloRepositorio.save(m);
@@ -81,8 +92,7 @@ public class DataInitializer implements CommandLineRunner {
         barco.setJugador(jugador);
         barco.setModelo(defaultModel);
         barcoRepositorio.save(barco);
-        // No es estrictamente necesario volver a guardar jugador, pero asegura relación bidireccional si luego se accede a la lista.
-        // Recargar jugador para forzar sincronización si fuese necesario.
+        
         System.out.println("Asignado barco inicial a jugador: " + jugador.getEmail());
     }
 }

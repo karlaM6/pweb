@@ -25,6 +25,7 @@ import com.microsoft.playwright.Browser;
 import com.microsoft.playwright.BrowserContext;
 import com.microsoft.playwright.BrowserType;
 import com.microsoft.playwright.Locator;
+import com.microsoft.playwright.options.SelectOption;
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.Playwright;
 import com.microsoft.playwright.assertions.PlaywrightAssertions;
@@ -32,7 +33,7 @@ import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 /**
- * Prueba de Sistema (End-to-End) para el flujo completo de una regata.
+ * Prueba de Sistema (End-to-End) para el flujo completo 
  * 
  * Caso de uso: "Crear una partida, ver el mapa, mover el barco, y alcanzar la meta"
  * 
@@ -229,8 +230,8 @@ public class RegataSystemTest {
         Locator selectJugador = page.locator("select");
         selectJugador.waitFor();
 
-        // Seleccionar el jugador "TestJugador"
-        page.selectOption("select", "1");  // Suponiendo que TestJugador tiene ID 1
+    // Seleccionar el jugador "TestJugador" por etiqueta (más robusto que usar un id fijo)
+    page.selectOption("select", new SelectOption().setLabel("TestJugador"));
         
         // Hacer clic en siguiente
         Locator btnSiguiente = page.locator("button:has-text('Siguiente')");
@@ -249,11 +250,20 @@ public class RegataSystemTest {
         btnSiguiente.click();
 
         // PASO 5: Esperar a que aparezcan los barcos disponibles
-        Locator cardBarco = page.locator(".card-barco").first();
-        cardBarco.waitFor();
-
-        // Seleccionar el primer barco disponible
-        cardBarco.click();
+        // El front puede mostrar barcos como tarjetas (.card-barco) o como un <select> (dropdown).
+        page.waitForTimeout(500);
+        Locator cardBarco = page.locator(".card-barco");
+        if (cardBarco.count() > 0) {
+            cardBarco.first().waitFor();
+            // Seleccionar el primer barco disponible (tarjeta)
+            cardBarco.first().click();
+        } else {
+            // Buscar un select de barcos (compatible con la nueva UI que muestra dropdown)
+            Locator selectBarco = page.locator("select[name=barco], select#barco, select");
+            selectBarco.waitFor();
+            // Seleccionar por etiqueta (nombre del barco creado en el setup)
+            selectBarco.selectOption(new SelectOption().setLabel("BarcoTest"));
+        }
 
         // PASO 6: Crear la partida
         Locator btnCrear = page.locator("button:has-text('Crear Partida')");

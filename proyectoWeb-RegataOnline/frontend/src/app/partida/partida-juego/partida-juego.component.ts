@@ -1,7 +1,8 @@
-import { Component, inject, signal, OnInit } from '@angular/core';
+import { Component, inject, signal, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { PartidaService, Partida } from '../../shared/partida.service';
+import { PartidaService, Partida, GameState, GameStateParticipant, BarcoResumen } from '../../shared/partida.service';
+import { AuthService } from '../../shared/auth.service';
 import { MapaService, Celda, Mapa } from '../../shared/mapa.service';
 
 @Component({
@@ -10,13 +11,16 @@ import { MapaService, Celda, Mapa } from '../../shared/mapa.service';
   templateUrl: './partida-juego.component.html',
   styleUrl: './partida-juego.component.css'
 })
-export class PartidaJuegoComponent implements OnInit {
+export class PartidaJuegoComponent implements OnInit, OnDestroy {
   partidaService = inject(PartidaService);
   mapaService = inject(MapaService);
   route = inject(ActivatedRoute);
   router = inject(Router);
 
   partida = signal<Partida | null>(null);
+  // Estado multijugador agregado
+  estadoMultijugador = signal<GameState | null>(null);
+  participantes = signal<GameStateParticipant[]>([]);
   mapa = signal<Mapa | null>(null);
   matrizCeldas = signal<Celda[][]>([]);
   celdasDestinoPosibles = signal<{x: number, y: number, aceleracionX: number, aceleracionY: number}[]>([]);
@@ -24,10 +28,52 @@ export class PartidaJuegoComponent implements OnInit {
   cargando = signal(true);
   mensaje = signal('');
   moviendo = signal(false);
+  // Flags y selección multijugador
+  multijugador = signal(true); // TODO: decidir dinámicamente según tipo de partida
+  jugadorId = signal<number | null>(null); // Se obtiene del JWT
+  barcoParaUnirId = signal(1); // Selección inicial de barco para unirse
+  barcosDisponibles = signal<BarcoResumen[]>([]);
+  barcoSeleccionadoId = signal<number | null>(null);
+
+  authService = inject(AuthService);
 
   ngOnInit(): void {
     const partidaId = +this.route.snapshot.params['id'];
+    const uid = this.authService.userId();
+    if (uid != null && !isNaN(uid)) {
+      this.jugadorId.set(uid);
+      // Cargar barcos del jugador para selección segura
+      this.partidaService.listarBarcosJugador(uid).subscribe({
+        next: barcos => {
+          this.barcosDisponibles.set(barcos);
+          if (barcos.length > 0) this.barcoParaUnirId.set(barcos[0].id);
+        },
+        error: err => console.warn('No se pudieron cargar barcos del jugador', err)
+      });
+    } else {
+      console.warn('No se pudo determinar jugadorId desde el JWT (uid=', uid, ')');
+    }
+    // Cargar partida base y estado; el usuario se unirá manualmente con el botón
     this.cargarPartida(partidaId);
+    if (this.multijugador()) {
+      this.cargarEstado(partidaId);
+    }
+    this.iniciarPolling(partidaId);
+  }
+
+  private pollingHandle: any;
+  iniciarPolling(partidaId: number) {
+    if (!this.multijugador()) return;
+    if (this.pollingHandle) clearInterval(this.pollingHandle);
+    this.pollingHandle = setInterval(() => {
+      const p = this.partida();
+      if (this.moviendo() || p?.estado === 'terminada') return;
+      this.cargarEstado(partidaId);
+    }, 5000);
+  }
+
+  ngOnDestroy(): void {
+    if (this.pollingHandle) clearInterval(this.pollingHandle);
   }
 
   cargarPartida(id: number) {
@@ -140,49 +186,53 @@ export class PartidaJuegoComponent implements OnInit {
   }
 
   moverBarco(aceleracionX: number, aceleracionY: number) {
-    const partida = this.partida();
-    if (!partida || !partida.id || partida.estado !== 'activa') {
-      this.mensaje.set('No se puede mover el barco en esta partida');
-      return;
-    }
-
-    this.moviendo.set(true);
-    this.mensaje.set('');
-
-    this.partidaService.moverBarco(partida.id, aceleracionX, aceleracionY).subscribe({
-      next: (partidaActualizada) => {
-        this.partida.set(partidaActualizada);
-        this.calcularDestinosPosibles();
-        this.moviendo.set(false);
-
-        // Verificar si llegó a la meta
-        if (partidaActualizada.haLlegadoMeta) {
-          this.mensaje.set('¡Felicidades! Has llegado a la meta en ' + 
-            partidaActualizada.movimientos + ' movimientos 🎉');
-        }
-      },
-      error: (err) => {
-        console.error('=== ERROR AL MOVER ===');
-        console.error('Error completo:', err);
-        console.error('err.error:', err.error);
-        console.error('err.error type:', typeof err.error);
-        console.error('err.message:', err.message);
-        console.error('err.status:', err.status);
-        
-        let errorMsg = 'Error desconocido';
-        if (typeof err.error === 'string') {
-          errorMsg = err.error;
-        } else if (err.error?.message) {
-          errorMsg = err.error.message;
-        } else if (err.message) {
-          errorMsg = err.message;
-        }
-        
-        this.mensaje.set(errorMsg);
-        this.moviendo.set(false);
-        alert('❌ Error del backend: ' + errorMsg);
+    if (this.multijugador()) {
+      const partidaId = this.partida()?.id;
+      const barcoId = this.barcoSeleccionadoId();
+      if (!partidaId || !barcoId) {
+        this.mensaje.set('Selecciona tu barco antes de mover');
+        return;
       }
-    });
+      this.moviendo.set(true);
+      this.partidaService.moverBarcoMultijugador(partidaId, barcoId, aceleracionX, aceleracionY).subscribe({
+        next: () => {
+          this.mensaje.set('Movimiento realizado');
+          this.moviendo.set(false);
+          this.cargarEstado(partidaId);
+        },
+        error: (err) => {
+          let errorMsg = err.error?.message || (typeof err.error === 'string' ? err.error : 'Error al mover');
+          this.mensaje.set(errorMsg);
+          this.moviendo.set(false);
+        }
+      });
+    } else {
+      const partida = this.partida();
+      if (!partida || !partida.id || partida.estado !== 'activa') {
+        this.mensaje.set('No se puede mover el barco en esta partida');
+        return;
+      }
+      this.moviendo.set(true);
+      this.mensaje.set('');
+      this.partidaService.moverBarco(partida.id, aceleracionX, aceleracionY).subscribe({
+        next: (partidaActualizada) => {
+          this.partida.set(partidaActualizada);
+          this.calcularDestinosPosibles();
+          this.moviendo.set(false);
+          if (partidaActualizada.haLlegadoMeta) {
+            this.mensaje.set('¡Felicidades! Has llegado a la meta en ' + partidaActualizada.movimientos + ' movimientos ');
+          }
+        },
+        error: (err) => {
+          let errorMsg = 'Error desconocido';
+          if (typeof err.error === 'string') errorMsg = err.error;
+          else if (err.error?.message) errorMsg = err.error.message;
+          else if (err.message) errorMsg = err.message;
+          this.mensaje.set(errorMsg);
+          this.moviendo.set(false);
+        }
+      });
+    }
   }
 
   clickCelda(x: number, y: number) {
@@ -204,11 +254,14 @@ export class PartidaJuegoComponent implements OnInit {
       console.log('Destino calculado: (', destino.x, ',', destino.y, ')');
       this.moverBarco(destino.aceleracionX, destino.aceleracionY);
     } else {
-      console.error('❌ No se encontró destino para (', x, ',', y, ')');
+      console.error(' No se encontró destino para (', x, ',', y, ')');
     }
   }
 
   esBarco(x: number, y: number): boolean {
+    if (this.multijugador()) {
+      return this.participantes().some(p => p.posicionX === x && p.posicionY === y);
+    }
     const partida = this.partida();
     return partida?.barcoPosicionX === x && partida?.barcoPosicionY === y;
   }
@@ -249,6 +302,14 @@ export class PartidaJuegoComponent implements OnInit {
   }
 
   obtenerIconoCelda(celda: Celda, x: number, y: number): string {
+    if (this.multijugador() && this.esBarco(x, y)) {
+      const participante = this.participantes().find(p => p.posicionX === x && p.posicionY === y);
+      if (participante) {
+        // Ícono distinto para cada barco usando modulo
+        const icons = ['⛵','🚤','🛶','🛥️','🚢'];
+        return icons[participante.barcoId % icons.length];
+      }
+    }
     if (this.esBarco(x, y)) return '⛵';
     
     switch(celda.tipo) {
@@ -307,5 +368,76 @@ export class PartidaJuegoComponent implements OnInit {
         }
       });
     }
+  }
+
+  // --- Métodos multijugador ---
+  participa(): boolean {
+    return this.participantes().some(p => p.jugadorId === this.jugadorId());
+  }
+
+  joinPartida() {
+    const partidaId = this.partida()?.id;
+    const jugadorActual = this.jugadorId();
+    const barcoId = this.barcoParaUnirId();
+    if (!partidaId || jugadorActual == null || isNaN(jugadorActual)) {
+      this.mensaje.set('Datos insuficientes para unirse');
+      return;
+    }
+    if (!this.barcosDisponibles().some(b => b.id === barcoId)) {
+      this.mensaje.set('Selecciona un barco válido de la lista');
+      return;
+    }
+    if (this.participa()) {
+      this.mensaje.set('Ya eres participante.');
+      return;
+    }
+    this.mensaje.set('Uniéndose a la partida...');
+    this.partidaService.unirAPartida(partidaId, jugadorActual, barcoId).subscribe({
+      next: estado => {
+        this.estadoMultijugador.set(estado);
+        this.participantes.set(estado.participantes);
+        const propio = estado.participantes.find(p => p.jugadorId === jugadorActual);
+        if (propio) this.barcoSeleccionadoId.set(propio.barcoId);
+        this.mensaje.set('Te has unido a la partida');
+      },
+      error: (err) => {
+        let msg: string;
+        if (typeof err.error === 'string') msg = err.error;
+        else if (err.error?.mensaje) msg = err.error.mensaje;
+        else if (err.error?.message) msg = err.error.message;
+        else if (err.error?.error) msg = err.error.error; // ErrorDTO serialized
+        else msg = 'No se pudo unir a la partida';
+        if (msg.includes('BARCO_INVALIDO')) {
+          msg = 'El barco seleccionado no pertenece a tu jugador. Elige uno de tu lista.';
+        }
+        this.mensaje.set(msg);
+      }
+    });
+  }
+
+  onBarcoInput(event: Event) {
+    const raw = (event.target as HTMLSelectElement).value;
+    const num = Number(raw);
+    if (!isNaN(num)) this.barcoParaUnirId.set(num);
+  }
+
+  cargarEstado(partidaId: number) {
+    this.partidaService.estadoPartida(partidaId).subscribe({
+      next: estado => {
+        this.estadoMultijugador.set(estado);
+        this.participantes.set(estado.participantes);
+        if (!this.barcoSeleccionadoId()) {
+          const propio = estado.participantes.find(p => p.jugadorId === this.jugadorId());
+          if (propio) this.barcoSeleccionadoId.set(propio.barcoId);
+        }
+      },
+      error: (err) => {
+        // Silenciar 404 (partida aún no creada o no accesible) para evitar spam
+        if (err.status === 404) return;
+        // Mostrar otros errores una sola vez
+        const msg = typeof err.error === 'string' ? err.error : (err.error?.message || 'Error obteniendo estado');
+        this.mensaje.set(msg);
+      }
+    });
   }
 }

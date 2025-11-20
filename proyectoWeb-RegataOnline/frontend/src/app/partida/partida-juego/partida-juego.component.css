@@ -162,6 +162,90 @@
   color: #e74c3c;
 }
 
+/* --- Multijugador --- */
+.multiplayer-section {
+  margin-top: 1.2rem;
+  border-top: 2px dashed #ecf0f1;
+  padding-top: 1rem;
+}
+
+.multiplayer-section h4 {
+  margin: 0 0 0.6rem 0;
+  font-size: 1rem;
+  color: #34495e;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.participantes-list {
+  list-style: none;
+  margin: 0 0 0.8rem 0;
+  padding: 0;
+  max-height: 180px;
+  overflow-y: auto;
+  border: 1px solid #ecf0f1;
+  border-radius: 10px;
+  background: #fafafa;
+}
+
+.participantes-list li {
+  padding: 0.55rem 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  font-size: 0.78rem;
+  border-bottom: 1px solid #eee;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.15s ease;
+}
+
+.participantes-list li:last-child {
+  border-bottom: none;
+}
+
+.participantes-list li:hover {
+  background: #eef6ff;
+}
+
+.participantes-list li.seleccionado {
+  background: #3498db;
+  color: #fff;
+  font-weight: 600;
+  position: relative;
+}
+
+.participantes-list li.seleccionado::after {
+  content: '✔';
+  position: absolute;
+  top: 6px;
+  right: 8px;
+  font-size: 0.75rem;
+}
+
+.participantes-list li.propietario:not(.seleccionado) {
+  background: #dff9fb;
+  font-weight: 600;
+}
+
+.participantes-list small {
+  opacity: 0.8;
+  font-family: 'Courier New', monospace;
+}
+
+.multiplayer-section .btn.btn-sm {
+  padding: 0.45rem 0.7rem;
+  font-size: 0.7rem;
+  background: #2980b9;
+  color: #fff;
+  border-radius: 6px;
+  border: none;
+}
+
+.multiplayer-section .btn.btn-sm:hover {
+  background: #1f5f86;
+}
+
 /* Controles */
 .controls-help {
   color: #555;

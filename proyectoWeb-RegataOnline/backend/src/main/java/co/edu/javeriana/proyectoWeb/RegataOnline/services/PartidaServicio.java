@@ -12,16 +12,19 @@ import org.springframework.transaction.annotation.Transactional;
 
 import co.edu.javeriana.proyectoWeb.RegataOnline.dto.CrearPartidaRequest;
 import co.edu.javeriana.proyectoWeb.RegataOnline.dto.PartidaDTO;
+import co.edu.javeriana.proyectoWeb.RegataOnline.dto.GameStateDTO;
 import co.edu.javeriana.proyectoWeb.RegataOnline.mapper.PartidaMapper;
 import co.edu.javeriana.proyectoWeb.RegataOnline.model.Barco;
 import co.edu.javeriana.proyectoWeb.RegataOnline.model.Celda;
 import co.edu.javeriana.proyectoWeb.RegataOnline.model.Jugador;
 import co.edu.javeriana.proyectoWeb.RegataOnline.model.Mapa;
 import co.edu.javeriana.proyectoWeb.RegataOnline.model.Partida;
+import co.edu.javeriana.proyectoWeb.RegataOnline.model.PartidaParticipante;
 import co.edu.javeriana.proyectoWeb.RegataOnline.repository.BarcoRepositorio;
 import co.edu.javeriana.proyectoWeb.RegataOnline.repository.JugadorRepositorio;
 import co.edu.javeriana.proyectoWeb.RegataOnline.repository.MapaRepositorio;
 import co.edu.javeriana.proyectoWeb.RegataOnline.repository.PartidaRepositorio;
+import co.edu.javeriana.proyectoWeb.RegataOnline.repository.PartidaParticipanteRepositorio;
 
 @Service
 public class PartidaServicio {
@@ -40,9 +43,12 @@ public class PartidaServicio {
     @Autowired
     private BarcoRepositorio barcoRepositorio;
 
-    /**
-     * Crea una nueva partida
-     */
+    @Autowired
+    private PartidaParticipanteRepositorio participanteRepositorio;
+
+    
+     //Crea una nueva partida
+     
     @Transactional
     public PartidaDTO crearPartida(CrearPartidaRequest request) {
         log.info("Creando nueva partida para jugador {}", request.getJugadorId());
@@ -94,8 +100,13 @@ public class PartidaServicio {
             celdaPartida.getPosicionX(), celdaPartida.getPosicionY());
 
         // Crear partida
-        Partida partida = new Partida(jugador, mapa, barco);
-        partida = partidaRepositorio.save(partida);
+    Partida partida = new Partida(jugador, mapa, barco);
+    partida = partidaRepositorio.save(partida);
+
+    // Crear primer participante (host)
+    PartidaParticipante participante = new PartidaParticipante(partida, jugador, barco);
+    participanteRepositorio.save(participante);
+    partida.agregarParticipante(participante);
 
         log.info("Partida creada exitosamente con ID: {}", partida.getId());
         return PartidaMapper.toDTO(partida);
@@ -120,6 +131,80 @@ public class PartidaServicio {
     public Optional<PartidaDTO> obtenerPartida(Long id) {
         return partidaRepositorio.findById(id)
             .map(PartidaMapper::toDTO);
+    }
+
+    /**
+     * Obtiene snapshot del estado multijugador de la partida.
+     */
+    public GameStateDTO obtenerEstadoPartida(Long partidaId) {
+        Partida partida = partidaRepositorio.findById(partidaId)
+            .orElseThrow(() -> new RuntimeException("Partida no encontrada con ID: " + partidaId));
+
+        GameStateDTO state = new GameStateDTO(partida.getId(), partida.getEstado(), partida.getHaLlegadoMeta());
+        List<PartidaParticipante> participantes = participanteRepositorio.findByPartida(partida);
+        for (PartidaParticipante p : participantes) {
+            Barco b = p.getBarco();
+            state.addParticipante(new GameStateDTO.ParticipantState(
+                p.getJugador().getId(),
+                p.getJugador().getEmail(),
+                b.getId(),
+                b.getNombre(),
+                b.getPosicionX(),
+                b.getPosicionY(),
+                b.getVelocidadX(),
+                b.getVelocidadY(),
+                p.getEstado()
+            ));
+        }
+        return state;
+    }
+
+    /**
+     * Un jugador se une a una partida existente con un barco propio.
+     */
+    @Transactional
+    public GameStateDTO unirAPartida(Long partidaId, Long jugadorId, Long barcoId) {
+        Partida partida = partidaRepositorio.findById(partidaId)
+            .orElseThrow(() -> new RuntimeException("Partida no encontrada con ID: " + partidaId));
+        if (!"activa".equals(partida.getEstado())) {
+            throw new RuntimeException("Solo se puede unir a partidas activas");
+        }
+        Jugador jugador = jugadorRepositorio.findById(jugadorId)
+            .orElseThrow(() -> new RuntimeException("Jugador no encontrado con ID: " + jugadorId));
+        Barco barco = barcoRepositorio.findById(barcoId)
+            .orElseThrow(() -> new RuntimeException("Barco no encontrado con ID: " + barcoId));
+
+        // Validar que el barco pertenece al jugador
+        if (barco.getJugador() != null && !barco.getJugador().getId().equals(jugador.getId())) {
+            throw new RuntimeException("El barco no pertenece a este jugador");
+        }
+
+        // Validar que el barco no esté ya en otra partida activa/pausada
+        if (participanteRepositorio.existsByBarcoAndPartida_EstadoIn(barco, Arrays.asList("activa", "pausada"))) {
+            throw new RuntimeException("El barco ya está en uso en otra partida activa/pausada");
+        }
+        // También revisar campo legado de Partida (por si matches single player existentes)
+        partidaRepositorio.findByBarcoAndEstadoIn(barco, Arrays.asList("activa", "pausada"))
+            .ifPresent(p -> { throw new RuntimeException("El barco ya está en uso en otra partida"); });
+
+        // Colocar barco en celda de partida si aún no tiene posición (usamos valores negativos como 'no inicializado')
+        if (barco.getPosicionX() < 0 || barco.getPosicionY() < 0) {
+            Celda celdaPartida = partida.getMapa().getCeldas().stream()
+                .filter(c -> "P".equals(c.getTipo()))
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("El mapa no tiene una celda de partida (tipo 'P')"));
+            barco.setPosicionX(celdaPartida.getPosicionX());
+            barco.setPosicionY(celdaPartida.getPosicionY());
+            barco.setVelocidadX(0);
+            barco.setVelocidadY(0);
+            barcoRepositorio.save(barco);
+        }
+
+        PartidaParticipante nuevo = new PartidaParticipante(partida, jugador, barco);
+        participanteRepositorio.save(nuevo);
+        partida.agregarParticipante(nuevo);
+
+        return obtenerEstadoPartida(partida.getId());
     }
 
     /**
@@ -196,7 +281,7 @@ public class PartidaServicio {
      * @param aceleracionY Cambio en velocidadY (-1, 0, o +1)
      */
     @Transactional
-    public PartidaDTO moverBarco(Long partidaId, Integer aceleracionX, Integer aceleracionY) {
+    public PartidaDTO moverBarco(Long partidaId, Integer aceleracionX, Integer aceleracionY, Long barcoId) {
         log.info("Moviendo barco en partida {} con aceleración ({}, {})", partidaId, aceleracionX, aceleracionY);
 
         // Validar aceleraciones
@@ -211,7 +296,18 @@ public class PartidaServicio {
             throw new RuntimeException("La partida no está activa");
         }
 
-        Barco barco = partida.getBarco();
+        Barco barco;
+        if (barcoId != null) {
+            // Buscar participante específico
+            barco = participanteRepositorio.findByPartida(partida).stream()
+                .map(PartidaParticipante::getBarco)
+                .filter(b -> b.getId().equals(barcoId))
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("El barco indicado no está en esta partida"));
+        } else {
+            // Modo legado single-player
+            barco = partida.getBarco();
+        }
         Mapa mapa = partida.getMapa();
 
         log.info("=== ESTADO ANTES DEL MOVIMIENTO ===");
@@ -237,7 +333,7 @@ public class PartidaServicio {
         if (nuevaPosicionX < 0 || nuevaPosicionX >= mapa.getColumnas() || 
             nuevaPosicionY < 0 || nuevaPosicionY >= mapa.getFilas()) {
             log.warn("Movimiento inválido: fuera del mapa");
-            throw new RuntimeException("❌ No puedes moverte ahí. El movimiento sale del mapa. Nueva posición: (" + 
+            throw new RuntimeException(" No puedes moverte ahí. El movimiento sale del mapa. Nueva posición: (" + 
                 nuevaPosicionX + ", " + nuevaPosicionY + ")");
         }
 
@@ -254,7 +350,7 @@ public class PartidaServicio {
             // Verificar si está fuera del mapa
             if (px < 0 || px >= mapa.getColumnas() || py < 0 || py >= mapa.getFilas()) {
                 log.warn("Movimiento inválido: Trayectoria sale del mapa en ({}, {})", px, py);
-                throw new RuntimeException("❌ No puedes moverte ahí. La trayectoria cruza el límite del mapa en (" + px + ", " + py + ")");
+                throw new RuntimeException("No puedes moverte ahí. La trayectoria cruza el límite del mapa en (" + px + ", " + py + ")");
             }
 
             // Verificar si atraviesa una pared
@@ -275,21 +371,32 @@ public class PartidaServicio {
             .findFirst()
             .orElse(null);
 
-        // 6. Actualizar velocidad y posición del barco
+        // 6. Verificar colisión con otros barcos (evitar misma celda final)
+        List<Barco> otrosBarcos = participanteRepositorio.findByPartida(partida).stream()
+            .map(PartidaParticipante::getBarco)
+            .filter(b -> !b.getId().equals(barco.getId()))
+            .toList();
+        for (Barco ob : otrosBarcos) {
+            if (ob.getPosicionX() == nuevaPosicionX && ob.getPosicionY() == nuevaPosicionY) {
+                throw new RuntimeException("Colisión con otro barco en la celda destino (" + nuevaPosicionX + ", " + nuevaPosicionY + ")");
+            }
+        }
+
+        // 7. Actualizar velocidad y posición del barco
         barco.setVelocidadX(nuevaVelocidadX);
         barco.setVelocidadY(nuevaVelocidadY);
         barco.setPosicionX(nuevaPosicionX);
         barco.setPosicionY(nuevaPosicionY);
         barcoRepositorio.save(barco);
 
-        // 7. Verificar si llegó a la meta
+        // 8. Verificar si llegó a la meta
         if (celdaDestino != null && "M".equals(celdaDestino.getTipo())) {
             partida.setHaLlegadoMeta(true);
             partida.setEstado("terminada");
             log.info("¡Barco llegó a la meta!");
         }
 
-        // 8. Incrementar contador de movimientos
+        // 9. Incrementar contador de movimientos (global de la partida)
         partida.setMovimientos(partida.getMovimientos() + 1);
         partida = partidaRepositorio.save(partida);
 

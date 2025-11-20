@@ -69,7 +69,7 @@ public class JugadorServicio {
     }
 
     /**
-     * Devuelve un UserDetailsService compatible con Spring Security.
+     * Devuelve un UserDetailsService 
      * Carga el Jugador por email (username) y devuelve la entidad Jugador
      * que implementa UserDetails.
      */
