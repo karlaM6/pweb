@@ -35,9 +35,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 /**
  * Prueba de sistema (end-to-end) del flujo completo.
  *
- * Caso de uso: "Crear una partida, ver el mapa, mover el barco y alcanzar la meta".
+ * Caso de uso: "Incio de sesión, crear una partida, ver el mapa, mover el barco y alcanzar la meta".
  *
- * Esta prueba e2e cubre el caso de uso más complejo del sistema e incluye:
+ * Esta prueba cubre el caso de uso más complejo del sistema e incluye:
  * 1. Creación de entidades (Jugador, Mapa y Barco).
  * 2. Creación de una partida.
  * 3. Navegación a la pantalla de juego.
@@ -80,14 +80,13 @@ public class RegataSystemTest {
 
     @BeforeEach
     void setup() {
-    // Limpiar datos en orden correcto (eliminar dependencias primero)
+    // Limpiar datos 
     barcoRepo.deleteAll();
     celdaRepo.deleteAll();
     mapaRepo.deleteAll();
     jugadorRepo.deleteAll();
     modeloRepo.deleteAll();
 
-    // Crear entidades necesarias
     // 1. Crear un jugador USER con credenciales para el login en la SPA
     Jugador jugador = new Jugador();
     jugador.setNombre("TestJugador");

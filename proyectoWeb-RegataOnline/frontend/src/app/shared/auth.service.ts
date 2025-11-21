@@ -13,7 +13,7 @@ const ROLE = 'user-role';
 export class AuthService {
   http = inject(HttpClient);
 
-  // Simple, untyped login to avoid coupling to DTOs in this shared service.
+  
   login(loginDto: any): Observable<any> {
     return this.http.post<any>(`${environment.baseUrl}/auth/login`, loginDto).pipe(
       map((jwt: any) => {
@@ -54,7 +54,7 @@ export class AuthService {
       const payloadPart = token.split('.')[1];
       if (!payloadPart) return null;
       const json = JSON.parse(atob(payloadPart));
-      // Prefer jugadorId claim embedded in JWT; fall back to numeric id/userId
+     
       const raw = json.jugadorId ?? json.id ?? json.userId;
       if (raw == null) return null;
       if (typeof raw === 'number') return raw;
@@ -65,20 +65,19 @@ export class AuthService {
     }
   }
 
-  // Return true when the stored role indicates admin privileges.
-  // We handle both plain strings like 'ADMIN' and any object/string that contains 'ADMIN'.
+  
   isAdmin(): boolean {
     const r = this.role();
     if (!r) return false;
     try {
-      // If role was stored as a JSON string, try parse and inspect
+      
       const parsed = JSON.parse(r);
       if (parsed && (parsed.authority || parsed.role || parsed.name)) {
         const val = (parsed.authority || parsed.role || parsed.name).toString().toUpperCase();
         return val.includes('ADMIN');
       }
     } catch (_) {
-      // not JSON, fallthrough
+     
     }
     return r.toString().toUpperCase().includes('ADMIN');
   }

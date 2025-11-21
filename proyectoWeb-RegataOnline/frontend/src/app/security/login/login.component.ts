@@ -69,7 +69,7 @@ export class LoginComponent {
       error: (err) => {
         this.loading = false;
         console.error('Login error', err);
-        // Try to display a useful message
+        
         this.error = err?.error?.message || err?.error || 'Error al iniciar sesión';
       }
     });

@@ -4,7 +4,8 @@ h1 {
     margin-bottom: 1.5rem;
     text-align: center;
     padding: 1rem;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  /* Unificar degradado azul con el estilo del menú de partida */
+  background: linear-gradient(135deg, #1e3c72 0%, #2a5298 50%, #3498db 100%);
     color: white;
     border-radius: 8px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);

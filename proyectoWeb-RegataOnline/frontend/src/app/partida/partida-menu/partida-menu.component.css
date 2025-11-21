@@ -10,7 +10,8 @@ h1 {
   margin-bottom: 2rem;
   text-align: center;
   padding: 1.5rem;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  /* Degradado azul: más consistente con la paleta azul del proyecto */
+  background: linear-gradient(135deg, #1e3c72 0%, #2a5298 50%, #3498db 100%);
   border-radius: 12px;
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
 }
@@ -171,7 +172,8 @@ label {
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, #0b6ef6 0%, #0056d6 100%);
+  /* Usar mismo degradado azul que el encabezado */
+  background: linear-gradient(135deg, #1e3c72 0%, #2a5298 50%, #3498db 100%);
   color: white;
 }
 

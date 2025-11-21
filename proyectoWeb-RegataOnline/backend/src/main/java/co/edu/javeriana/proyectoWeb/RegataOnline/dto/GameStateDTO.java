@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Snapshot del estado de una partida multijugador.
+ * estado de una partida multijugador.
  */
 public class GameStateDTO {
 
